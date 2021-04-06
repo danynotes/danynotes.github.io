@@ -84,10 +84,12 @@
 		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 			<i class="fa fa-bars"></i>
 		</button>
+	
 		<ul class="dropdown-menu" role="menu">
-			<li><a href="{{ site.BASE_PATH}}/"><i class="fa fa-home"></i>Home</a></li>
-			<li><a href="{{ site.BASE_PATH}}/{{ site.categories_path }}"><i class="fa fa-folder"></i>Categories</a></li>
-			<li><a href="{{ site.BASE_PATH}}/{{ site.tags_path }}"><i class="fa fa-tags"></i>Tags</a></li>
+			<li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+			{% for i in site.urls %}
+				<li><a href="{{ i.url }}"><i class="{{ i.cls }}"></i>{{ i.text }}</a></li>
+			{% endfor %}
 		</ul>
 	</div>
 
