@@ -16,6 +16,24 @@ defaults:
     values:
       title: dbyll
 
+rss_path: feed.xml
+categories_path: categories.html
+tags_path: tags.html
+
+urls:
+    - text: About Me
+      url: /about
+      cls: fa fa-info-circle
+    - text: Categories
+      url: categories.html
+      cls: fa fa-list-alt
+    - text: Tags
+      url: tags.html
+      cls: fa fa-tags
+    - text: Feed
+      url: feed.xml
+      cls: fa fa-rss
+
 description: Stylish Jekyll Theme
 author:
   name: dbyll
@@ -27,9 +45,7 @@ author:
   bio: Your stylish, minimalist theme!
   email_md5: 726351295ec82e145928582f595aa3aa
 
-rss_path: feed.xml
-categories_path: categories.html
-tags_path: tags.html
+
 
 # set it as url of an image
 # sidebar_background_image: https://www.dropbox.com/s/g9h23zrycedxtk5/sky.png?raw=1
