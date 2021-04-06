@@ -30,6 +30,9 @@ urls:
     - text: Tags
       url: tags.html
       cls: fa fa-tags
+    - text: Search
+      url: /search
+      cls: fa fa-search
     - text: Feed
       url: feed.xml
       cls: fa fa-rss
