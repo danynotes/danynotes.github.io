@@ -5,36 +5,60 @@ paginate_path: "page:num"
 exclude: ["README.md"] # files to exclude
 highlighter: rouge
 markdown: kramdown
-disqus: dbyll
-google_analytics: dbyll
-title: dbyll
+disqus: danynotes-github-io
+google_analytics: danynotes
+title: Dany Christianto
 
 defaults:
   -
     scope:
       path: "" # empty string for all files
     values:
-      title: dbyll
-
-description: Stylish Jekyll Theme
-author:
-  name: dbyll
-  email: dbyll@ismaildemirbilek.com
-  github: dbtek
-  twitter: dbtek
-  pinterest: asd123
-  linkedin: asd123
-  bio: Your stylish, minimalist theme!
-  email_md5: 726351295ec82e145928582f595aa3aa
+      title: danynotes
 
 rss_path: feed.xml
 categories_path: categories.html
 tags_path: tags.html
 
+urls:
+    - text: About Me
+      url: /about
+      cls: fa fa-info-circle
+    - text: Categories
+      url: categories.html
+      cls: fa fa-list-alt
+    - text: Tags
+      url: tags.html
+      cls: fa fa-tags
+    - text: Search
+      url: /search
+      cls: fa fa-search
+    - text: Feed
+      url: feed.xml
+      cls: fa fa-rss
+
+description: dany christianto's note
+author:
+  name: Dany Christianto
+  email: danychristianto@gmail.com
+  github: noufath
+  twitter: ''
+  pinterest: ''
+  linkedin: dany-christianto-06b7151b9/
+  bio: Software Developer
+  email_md5: f3d12d02704b1ed4d50a341c868e3be1
+  
 # set it as url of an image
-# sidebar_background_image: https://www.dropbox.com/s/g9h23zrycedxtk5/sky.png?raw=1
+sidebar_background_image: https://bn1303files.storage.live.com/y4mITEMuSgzLVhCBe-_3nwBGw5YZJrwC9wgL3oCV3vLHYWvWRuHuWT0pnqU2B4I7HnBkaLKkWI5CsuqlK6MUhXjgfcXQfqVL4LMjdCHhKYnimnIJSwjc2-yjhDCJuQbSWHt8N0BgQB_swqXKkEKGAapC7bSIZ2OAhG6ftwpmBq67TgAdamYun2AE8qDFCXInHId?width=580&height=1080&cropmode=none
 
 BASE_PATH:
 
 plugins:
   - jekyll-paginate
+
+compress_html:
+  clippings: all
+  comments: ["<!-- ", " -->"]
+  endings: all
+  ignore:
+    envs: ['development']

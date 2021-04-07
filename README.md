@@ -1,12 +1,5 @@
-dbyll
-=====
-
-Open source stylish, minimalistic theme for jekyll.  
-Demo: http://dbtek.github.io/dbyll/
-
-## New
-- Dbyll for Ghost is now available. Get it [here](https://github.com/dbtek/dbyll-ghost) now.
-- :new: Check out [Paper](https://github.com/dbtek/paper), new Material Design Jekyll theme.
+## Reference
+This theme forked from https://github.com/dbtek/dbyll and add a little modification
 
 ### Features
 - Responsive layout.
@@ -18,10 +11,8 @@ Demo: http://dbtek.github.io/dbyll/
 - Syntax highlighting with pygments.
 - Disqus comments.
 - :new: Custom sidebar background image.
-
-
-### Download
-* [Download dbyll](https://github.com/dbtek/dbyll/archive/master.zip)
+- Read duration
+- Search post
 
 ### Install
 - You need to have [ruby](https://www.ruby-lang.org/en/documentation/installation/) installed in your system.
@@ -30,8 +21,7 @@ Demo: http://dbtek.github.io/dbyll/
 - Then - ```bundle exec jekyll serve```
 
 ### Screenshots
-![dbyll-screenshot](assets/media/dbyll-ss.png)
+![danynotes-screenshot](assets/media/danynotes-ss.png)
 
 ### License
 - [MIT](http://opensource.org/licenses/MIT)
-
