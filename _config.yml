@@ -48,14 +48,17 @@ author:
   bio: Software Developer
   email_md5: f3d12d02704b1ed4d50a341c868e3be1
   
-
-
-
 # set it as url of an image
-gravatar : https://s.gravatar.com/avatar/f3d12d02704b1ed4d50a341c868e3be1?s=120
 sidebar_background_image: https://bn1303files.storage.live.com/y4mITEMuSgzLVhCBe-_3nwBGw5YZJrwC9wgL3oCV3vLHYWvWRuHuWT0pnqU2B4I7HnBkaLKkWI5CsuqlK6MUhXjgfcXQfqVL4LMjdCHhKYnimnIJSwjc2-yjhDCJuQbSWHt8N0BgQB_swqXKkEKGAapC7bSIZ2OAhG6ftwpmBq67TgAdamYun2AE8qDFCXInHId?width=580&height=1080&cropmode=none
 
 BASE_PATH:
 
 plugins:
   - jekyll-paginate
+
+compress_html:
+  clippings: all
+  comments: ["<!-- ", " -->"]
+  endings: all
+  ignore:
+    envs: ['development']
