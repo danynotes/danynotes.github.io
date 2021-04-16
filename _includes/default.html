@@ -53,11 +53,6 @@
 				<i class="fa fa-github"></i>
 			</a>
 			{% endif %}
-			{% if site.author.twitter %}
-			<a type="button" class="navbar-toggle nav-link" href="http://twitter.com/{{ site.author.twitter }}">
-				<i class="fa fa-twitter"></i>
-			</a>
-			{% endif %}
 			{% if site.author.email %}
 			<a type="button" class="navbar-toggle nav-link" href="mailto:{{ site.author.email }}">
 				<i class="fa fa-envelope"></i>
@@ -72,9 +67,10 @@
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li class="active"><a href="{{ site.BASE_PATH }}/">Home</a></li>
-				<li><a href="{{ site.BASE_PATH}}/{{ site.categories_path }}">Categories</a></li>
-				<li><a href="{{ site.BASE_PATH}}/{{ site.tags_path }}">Tags</a></li>
+				<li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+				{% for i in site.urls %}
+				<li><a href="{{ i.url }}"><i class="{{ i.cls }}"></i>{{ i.text }}</a></li>
+				{% endfor %}
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</nav>
