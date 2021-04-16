@@ -55,10 +55,3 @@ BASE_PATH:
 
 plugins:
   - jekyll-paginate
-
-compress_html:
-  clippings: all
-  comments: ["<!-- ", " -->"]
-  endings: all
-  ignore:
-    envs: ['development']
