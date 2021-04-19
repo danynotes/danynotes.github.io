@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Convert MS Access to PostgreSQL using Python
+title: MSAccess to PostgreSQL using Python
 categories: [Database]
 tags: [MSAccess, PostgreSQL, Python]
-description: Note about how to Converting MS Access database to PostgreSQL database using python
+description : Converting MSAccess to PostgreSQL using python
 date: 2021-04-16 22:45:00 +0700
 ---
 
