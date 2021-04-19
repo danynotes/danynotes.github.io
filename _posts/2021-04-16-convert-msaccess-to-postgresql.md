@@ -8,9 +8,9 @@ date: 2021-04-16 22:45:00 +0700
 ---
 
 
-MSAccess can be used to design a database because it has relationship diagram tools that can be used to create tables relations and test them directly. The problem is how if I need to develop an application in PostgreSQL, I can easily find many online converters available on the internet but they are not friendly for the wallet, so I need to make the conversion from MSAccess to PostgreSQL. 
+MS Access can be used to design a database because it has relationship diagram tools that can be used to create tables relations and test them directly. The problem is how if I need to develop an application in PostgreSQL, I can easily find many online converters available on the internet but they are not friendly for the wallet, so I need to make the conversion from MSAccess to PostgreSQL. 
 
-## Preparing MSAccess
+## Preparing MS Access
 
 1. Grant read access for Admin role to read relationship/foreign key information by executing scripts below in MSAccess Immediate panel.
     ```bash
@@ -64,7 +64,7 @@ Because we need Microsoft Access Driver, so these scripts only running in Window
             }
     ```
 
-3. Step 3:Get MsAccess Database Name
+3. Step 3:Get Ms Access Database Name
     ```python
         def get_access_dbname(self):
             for table in self.access_cursor.tables():
@@ -88,7 +88,7 @@ Because we need Microsoft Access Driver, so these scripts only running in Window
     ```
 5. Step 5:Create schema on PostgreSQL server
 
-    After getting MSAccess schema, then create it on PostgreSQL
+    After getting MS Access schema, then create it on PostgreSQL
 
     ```python
         def create_schema(self):
@@ -279,7 +279,7 @@ Because we need Microsoft Access Driver, so these scripts only running in Window
 
     @click.command()
     @click.option('--mdbfile', 
-        prompt="Full path of MSAccess Source file", help="Full path of MSAccess source file")
+        prompt="Full path of MS Access Source file", help="Full path of MS Access source file")
     @click.option('--psql_host', 
         prompt="PostgreSQL IP server", help="PostgreSQL ip server")
     @click.option('--psql_db', 
