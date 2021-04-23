@@ -286,10 +286,10 @@ Because we need Microsoft Access Driver, so these scripts only running in Window
         prompt="PostgreSQL Database Name", help="Database Name")
     @click.option('--psql_user', 
         prompt="PostgreSQL user", help="PostgreSQL user")
-    @click.option('--psql_pass', 
-        prompt="PostgreSQL user password", help="PostgreSQL password")
     @click.option('--print_query', 
-        prompt="View sqldump (Y/n)", help="show sql dump to screen")
+        prompt="View sqldump ", help="show sql dump to sql", is_flag=True)
+    @click.option('--use_schema', 
+        prompt="Use Schema ", help="choose Y if use schema", is_flag=True)
 
     def convert_mdb_to_psql(mdbfile, psql_host, psql_db, psql_user, psql_pass, print_query):
         if not os.path.exists(mdbfile):
