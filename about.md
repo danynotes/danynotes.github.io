@@ -13,6 +13,6 @@ And with this pages help me notice the existing notes whenever I need some day a
 
 ### About me
 
-I'm Dany Christianto, previously i work as IT Manager and now I'm working as freelance software developer. Currently using python and interested in data science. Hopefully this simple pages can be useful, don't hesitate to leave a comment, let me know what your thoughts.
+I'm Dany Christianto, previously i work as IT Manager and now I'm working as freelance systems engineer. Currently using python and interested in data science. Hopefully this simple pages can be useful, don't hesitate to leave a comment, let me know what your thoughts.
 
-email: danychristianto[at]gmail.com
+Reach me at danychristianto[at]gmail.com
