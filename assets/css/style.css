@@ -12,7 +12,7 @@ body{
 	top: 0px;
 	padding-top: 2%;
 	background-color: #2c3e50;
-	color:darkslategray;
+	color:#fff;
 }
 
 .sidebar-header {
@@ -27,7 +27,7 @@ body{
 .sidebar-header .title a{
 	font-family: 'New Tegomin', serif;
 	text-decoration: none;
-	color: darkslategray;
+	color: #fff;
 }
 
 a.nav-link {
