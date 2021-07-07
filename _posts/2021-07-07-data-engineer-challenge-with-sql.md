@@ -19,7 +19,7 @@ Challenge SQL yang dibuat oleh [xeratic](https://www.phi-integration.com/) ini m
 | no_urut        | Integer |   |   | no_urut     | Integer |
 | kode_pelanggan | Varchar |   |   | kode_produk | Varchar |
 | nama_pelanggan | Varchar |   |   | nama_produk | Varchar |
-| alamat         | Varchar |   |   | harga       | Double  |
+| alamat         | Varchar |   |   | harga       | Double  |  
 
 
 
