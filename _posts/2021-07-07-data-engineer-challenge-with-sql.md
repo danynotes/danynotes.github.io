@@ -12,13 +12,13 @@ date: 2021-07-07 13:48:00 +0700
 Challenge SQL ini merupakan challenge pertama di dalam chapter projects DQLab Course yang bertujuan untuk menguji tingkat pemahaman SQL dan dibuat oleh [xeratic](https://www.phi-integration.com/).
 
 ## Tabel data yang tersedia
-|  ms_pelanggan  |         |   |   |   |  ms_produk  |         |
-|:--------------:|:-------:|:-:|:-:|---|:-----------:|:-------:|
-|      Field     |   Type  |   |   |   |    Field    |   Type  |
-| no_urut        | Integer |   |   |   | no_urut     | Integer |
-| kode_pelanggan | Varchar |   |   |   | kode_produk | Varchar |
-| nama_pelanggan | Varchar |   |   |   | nama_produk | Varchar |
-| alamat         | Varchar |   |   |   | harga       | Double  |
+|  ms_pelanggan  |         |   |   |  ms_produk  |         |   |
+|:--------------:|:-------:|:-:|:-:|:-----------:|:-------:|---|
+|      Field     |   Type  |   |   |    Field    |   Type  |   |
+| no_urut        | Integer |   |   | no_urut     | Integer |   |
+| kode_pelanggan | Varchar |   |   | kode_produk | Varchar |   |
+| nama_pelanggan | Varchar |   |   | nama_produk | Varchar |   |
+| alamat         | Varchar |   |   | harga       | Double  |   |
 
 |    tr_penjualan   |         |   |   |   | tr_penjualan_detail |         |
 |:-----------------:|:-------:|:-:|:-:|---|:-------------------:|:-------:|
