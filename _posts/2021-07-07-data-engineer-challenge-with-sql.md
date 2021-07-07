@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Data Engineer Challenge with SQL
-categories: [Database, Data Engineer]
-tags: [SQL]
+categories: [Data Engineer]
+tags: [SQL, Data Engineer]
 description : DQLab 1st Challenge for Data Engineer
 date: 2021-07-07 13:48:00 +0700
 ---
