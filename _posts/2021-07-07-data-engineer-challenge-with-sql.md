@@ -11,7 +11,8 @@ date: 2021-07-07 13:48:00 +0700
 # About this Challenge  
 Challenge SQL yang dibuat oleh [xeratic](https://www.phi-integration.com/) ini merupakan challenge pertama di dalam chapter projects DQLab Course yang bertujuan untuk menguji tingkat pemahaman SQL.
 
-## Tabel data yang tersedia
+## Tabel data yang tersedia  
+
 |  ms_pelanggan  |         |   |   |  ms_produk  |         |
 |:--------------:|:-------:|:-:|:-:|:-----------:|:-------:|
 |      Field     |   Type  |   |   |    Field    |   Type  |
