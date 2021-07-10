@@ -1,14 +1,15 @@
 ---
 layout: post
 title: Data Engineer Challenge with SQL
-categories: [Data Engineer]
-tags: [SQL, Data Engineer]
-description : DQLab 1st Challenge for Data Engineer
+categories: [Data Analyst]
+tags: [SQL, Data Analyst]
+description : DQLab project for Data Engineer Challenge with SQL
 date: 2021-07-07 13:48:00 +0700
 ---
 
 
 # About this Challenge  
+
 Challenge SQL yang dibuat oleh [xeratic](https://www.phi-integration.com/) ini merupakan challenge pertama di dalam chapter projects DQLab Course yang bertujuan untuk menguji tingkat pemahaman SQL.
 
 ## Tabel data yang tersedia  
