@@ -7,7 +7,7 @@ description : DQLab projects - Data Science Customer Segmentation with python Pa
 date: 2021-07-19 14:03:00 +0700
 ---
 
-Setelah melakukan explorasi data selanjutnya di part ke-3 ini kita melakukan persiapan data sebelum membuat model.
+Setelah melakukan [explorasi data](/data%20science/2021/07/19/customer-segmentation-with-python-part2) selanjutnya di part ke-3 ini kita melakukan persiapan data sebelum membuat model.
 
 ## Mempersiapkan Data sebelum permodelan
 
@@ -138,3 +138,5 @@ Pada penerapan di industri, proses pemrosesan data ini termasuk yang paling bany
 - Melakukan data imputation ketika ada *Null* data di data set yang akan digunakan  
 - Melakukan transformasi variabel, ketika ditemukan distribusi data yang condong ke salah satu sisi (skew data)  
 - Menangani pencilan data
+
+Lanjut ke [pembuatan model](/data%20science/2021/07/19/customer-segmentation-with-python-part4).

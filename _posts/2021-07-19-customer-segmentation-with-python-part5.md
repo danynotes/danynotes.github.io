@@ -7,7 +7,7 @@ description : DQLab projects - Data Science Customer Segmentation with python Pa
 date: 2021-07-19 14:03:00 +0700
 ---
 
-Setelah model jadi pada part-4, selanjutnya tahap mengoperasikan model.
+Setelah model jadi pada [part-4](/data%20science/2021/07/19/customer-segmentation-with-python-part4), selanjutnya tahap mengoperasikan model.
 
 # Mengoperasikan Model
 

@@ -7,7 +7,7 @@ description : DQLab projects - Data Science Customer Segmentation with python Pa
 date: 2021-07-19 14:03:00 +0700
 ---
 
-Setelah data dirapikan pada part-3, selanjutnya pada tahap ini dibuat per-modelan.
+Setelah data dirapikan pada [part-3](/data%20science/2021/07/19/customer-segmentation-with-python-part3), selanjutnya pada tahap ini dibuat per-modelan.
 
 ## Clustering dan Algoritma K-Prototypes
 **Clustering** adalah proses pembagian objek-objek ke dalam beberapa kelompok (cluster) berdasarkan tingkat kemiripan antara satu objek dengan yang lain.
@@ -381,3 +381,5 @@ Pada aplikasi di industri proses penentuan cluster yang optimum bisa dilakukan j
 Selain itu penentuan jumlah cluster yang optimal juga perlu mepertimbangkan masukan dari tim yang akan menggunakan model nya. Sehingga bisa menghasilkan cluster yang sesuai dengan kebutuhan mereka dan juga bagaimana cara mereka akan memperlakukan segmen-segmen ini.
 
 Tantangan lainnya adalah jumlah data yang jauh lebih banyak di banding dengan data set digunakan untuk latihan ini. Sehingga waktu pemrosesan datanya dan pembuatan model nya akan menjadi lebih lama.
+
+Langkat berikutnya yaitu [mengoperasikan model yang telah dibuat](/data%20science/2021/07/19/customer-segmentation-with-python-part5).

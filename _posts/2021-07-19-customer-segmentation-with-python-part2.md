@@ -314,3 +314,5 @@ Dari hasil explorasi data tersebut didapat informasi bahwa :
 ### Tips:
 Dengan eksplorasi data kita dapat mengenal lebih jauh tentang data yang ada.
 Proses eskplorasi data bisa berupa univariate maupun multivariate data eksplorasi. Eksplorasi Data Univariate melihat karakteristik tiap-tiap feature, misalnya dengan melihat statistik destriptif, membuat histogram, kdeplot, count plot maupun boxplot. Sedangkan untuk Eksplorasi Data Multivariate, untuk melihat hubungan tiap variabel dengan variabel lainnya, misalkan dengan membuat korelasi matrix, melihat predictive power, cross tabulasi dan lainnya.
+
+Lanjut ke [persiapan permodelan](/data%20science/2021/07/19/customer-segmentation-with-python-part3)
