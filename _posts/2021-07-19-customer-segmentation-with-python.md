@@ -99,4 +99,4 @@ Dalam setiap project *machine learning* kita harus memahami informasi dasar dari
 - Tidak ada nilai Null pada data
 - Dua kolom memiliki tipe data numeric dan lima data bertipe string
 
-Lanjut [Explorasi Data](/data%20science/2021/07/19/customer-segmentation-with-python-part2) 
+Lanjut [Explorasi Data](data%20science/2021/07/19/customer-segmentation-with-python-part2) 
