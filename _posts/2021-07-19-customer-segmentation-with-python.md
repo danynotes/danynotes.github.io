@@ -98,3 +98,5 @@ Dalam setiap project *machine learning* kita harus memahami informasi dasar dari
 - Data yang akan digunakan terdir dari 50 baris dan 7 kolom.  
 - Tidak ada nilai Null pada data
 - Dua kolom memiliki tipe data numeric dan lima data bertipe string
+
+Lanjut [Explorasi Data](/data%20science/2021/07/19/customer-segmentation-with-python-part2) 

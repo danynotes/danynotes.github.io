@@ -7,7 +7,7 @@ description : DQLab projects - Data Science Customer Segmentation with python Pa
 date: 2021-07-19 14:03:00 +0700
 ---
 
-Setelah melakukan persiapan library dan membaca data pada part 1 selanjutnya kita akan lakukan explorasi data. 
+Setelah melakukan persiapan library dan membaca data pada [part 1]("/data%20science/2021/07/19/customer-segmentation-with-python") selanjutnya kita akan lakukan explorasi data. 
 
 ## Melakukan Eksplorasi Data
 Lakukan eksplorasi data untuk lebih mengenal dataset yang akan digunakan. Lakukan eksplorasi untuk data numerik dan juga data kategorikal.
