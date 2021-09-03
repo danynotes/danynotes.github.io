@@ -258,3 +258,47 @@ input#js-search__input {
     visibility: visible;
 }
   
+/* google adds  */
+
+:host {
+	display: block;
+	position: relative;
+  
+	  
+	--tf-creative-preview-viewport-responsive-padding: 22px;
+  }
+  
+  :host([responsive]) .scroll-overflow {
+	width: 100%;
+	height: 100%;
+	
+  }
+  
+  #stage {
+	padding: var(--tf-creative-preview-stage-padding);
+	z-index: 0;
+	overflow: auto;
+	display: var(--layout_-_display);
+  }
+  
+  :host([responsive]) #stage {
+	padding: var(--tf-creative-preview-viewport-responsive-padding) 0
+		  0 var(--tf-creative-preview-viewport-responsive-padding);
+	height: 100%;
+	width: 100%;
+	display: block;
+	position: absolute;
+	box-sizing: border-box;
+  }
+  
+  :host([responsive]) #stage .scroll-overflow {
+	overflow: auto;
+	  
+	padding: 2px 0 0 2px;
+	box-sizing: border-box;
+  }
+  
+  iframe {
+	border: none;
+	background: #fff;
+  }

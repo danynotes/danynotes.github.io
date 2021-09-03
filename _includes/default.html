@@ -30,7 +30,7 @@
 	<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
 	-->
 	<script data-ad-client="ca-pub-1323647438623765" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-	
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1323647438623765" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -97,20 +97,25 @@
 
 	<div class="col-sm-9 col-sm-offset-3">
 		{{ content }}
-		<div>
-			<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1323647438623765"
-				crossorigin="anonymous"></script>
-			<!-- horizontal_center -->
-			<ins class="adsbygoogle"
-				style="display:block"
-				data-ad-client="ca-pub-1323647438623765"
-				data-ad-slot="6506466622"
-				data-ad-format="auto"
-				data-full-width-responsive="true"></ins>
-			<script>
-				(adsbygoogle = window.adsbygoogle || []).push({});
-			</script>
+
+		<div id="stage">
+			<div class="scroll-overflow">
+				<div id="stage-scroll-content">
+					<iframe id="iframe" slot="content" scrolling="no" height="90" width="970"> 
+						<!-- horizontal_center -->
+						<ins class="adsbygoogle"
+							style="display:block"
+							data-ad-client="ca-pub-1323647438623765"
+							data-ad-slot="6506466622"
+							data-ad-format="auto"
+							data-full-width-responsive="true">
+						</ins>
+					</iframe>
+				</div>
+			</div>
 		</div>
+
+
 		<footer>
 			<hr/>
 			<p>
@@ -118,7 +123,7 @@
 			</p>
 		</footer>
 	</div>
-
+	<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 	<script type="text/javascript" src="{{ site.BASE_PATH }}/assets/resources/jquery/jquery.min.js"></script>
 	<script type="text/javascript" src="{{ site.BASE_PATH }}/assets/resources/bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="{{ site.BASE_PATH }}/assets/js/app.js"></script>
