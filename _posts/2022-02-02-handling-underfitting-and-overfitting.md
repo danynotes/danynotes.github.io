@@ -19,7 +19,7 @@ Underfitting adalah kondisi dimana model gagal menangkap perbedaan pola penting 
 
 Grafik berikut menggambarkan ***Underfitting*** dan ***Overfitting***
 
-![underfitting overfitting](../assets/media/model-underfitting-overfitting.png)
+![underfitting overfitting](http://danynotes.github.io/assets/media/model-underfitting-overfitting.png)
 
 ## Mengatasi Underfitting atau Overfitting ##
 
