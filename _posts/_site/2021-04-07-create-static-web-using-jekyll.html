@@ -1,0 +1,133 @@
+<h1 id="why-static-site-">Why static site ?</h1>
+<p>Sangat cocok untuk kebutuhan blog post atau website sederhana karena ringan, cepat dan mudah mengkonfigurasinya, yang kedua membuat artikel di jekyll cukup membuat file text dengan format markdown (.md) yang bisa dilakukan secara offline tanpa harus menggunakan admin dashboard, kemudian yang ketiga dapat di hosting dengan gratis menggunakan github / gitlab, los dol tanpa ribet setting server hosting 😊</p>
+
+<h1 id="tools-apa-yang-di-perlukan">Tools apa yang di perlukan</h1>
+<p>Untuk membuat website statis yang diperlukan sebagai berikut :</p>
+<ol>
+  <li>Jekyll sebagai static generator</li>
+  <li>GitHub/Gitlab account, dalam catatan ini saya menggunakan GitHub</li>
+  <li>Internet Browser</li>
+  <li>Text Editor</li>
+</ol>
+
+<h1 id="bagaimana-caranya">Bagaimana caranya</h1>
+<ol>
+  <li>
+    <p>Install jekyll, saat ini saya menggunakan windows dengan WSL (Windows Subsystem for Linux) dengan distro Ubuntu 18.04 LTS.</p>
+
+    <p>Update repository lists dan packages:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>apt-get update <span class="nt">-y</span> <span class="o">&amp;&amp;</span> <span class="nb">sudo </span>apt-get upgrade <span class="nt">-y</span>
+</code></pre></div>    </div>
+
+    <p>Berikutnya install Ruby untuk Ubuntu dari repository BrightBox:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>apt-add-repository ppa:brightbox/ruby-ng
+ <span class="nb">sudo </span>apt-get update
+ <span class="nb">sudo </span>apt-get <span class="nb">install </span>ruby2.5 ruby2.5-dev build-essential dh-autoreconf
+</code></pre></div>    </div>
+
+    <p>Selanjutnya update Ruby gems:</p>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> gem update
+</code></pre></div>    </div>
+
+    <p>Dan lanjut install jekyll:</p>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> gem <span class="nb">install </span>jekyll bundler
+</code></pre></div>    </div>
+    <p>terakhir check jekyll version:</p>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> jekyll <span class="nt">-v</span>
+</code></pre></div>    </div>
+    <p>Installasi jekyll selesai dan sudah siap digunakan di lingkungan WSL.</p>
+  </li>
+  <li>
+    <p>Jalankan perintah untuk membuat website</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> jekyll new <span class="o">[</span>nama_site]
+</code></pre></div>    </div>
+
+    <p>Ketika perintah tersebut dijalankan jekyll menggunakan theme minima sebagai tema default. dan website sudah bisa dijalankan dengan perintah berikut :</p>
+
+    <p>Masuk ke directory site yang dibuat:</p>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">cd </span>nama_site
+</code></pre></div>    </div>
+
+    <p>Jalankan service:</p>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> bundle <span class="nb">exec </span>jekyll serve
+</code></pre></div>    </div>
+
+    <p>Buka internet browser dan akses url localhost:4000 atau 127.0.0.0:4000. dan website dengan tampilan default theme seperti berikut:</p>
+
+    <p><img src="https://1.bp.blogspot.com/-rMqzQdIc8-U/YG28DzRJNvI/AAAAAAAAUbA/NcYDWRnW1AM3Xw92m6-4j98THhfCXmZ3wCLcBGAsYHQ/s1497/minima-theme-jekyll.png" alt="jekyllrun" /></p>
+
+    <p>untuk mengubah nama website dan link sosial media edit variabel yang ada di file _config.yml.</p>
+  </li>
+  <li>
+    <p>Membuat posting</p>
+
+    <p>Direktori site default jekyll pertama kali dibuat seperti ini :</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">.</span>
+ ├── jekyll-cache
+ ├── _posts
+ ├──  └── 2021-04-07-welcome-to-jekyll.md
+ ├── _sites
+ ├── _config
+ ├── 404.html
+ ├── about.md
+ ├── Gemfile
+ ├── Gemfile.lock
+ ├── index.md
+</code></pre></div>    </div>
+
+    <p>Untuk membuat post, didalam folder _posts buat file markdown dengan format nama file : empat digit tahun, diikuti tanda hyphen (-) kemudian dua digit bulan, tanda hyphen (-) lagi dan dua digit tanggal, tanda hypen (-) lagi diakhiri dengan judul dan ekstensi markdown (.md), seperti berikut ini :</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> YYYY-MM-DD-title.md
+</code></pre></div>    </div>
+
+    <p>Setelah file dibuat, pada baris paling atas di file post tersebut tambahkan beberapa Front Matter, diantara tanda tripe dashes (—).
+ Minimal dalam satu file post terdapat 2 keys berikut :</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nt">---</span>
+ layout: post
+ title: <span class="s1">'I Love jekyll'</span>
+ <span class="nt">---</span>
+</code></pre></div>    </div>
+
+    <p>File post sample ketika pertama kali site di buat terdapat 4 keys berikut :</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nt">---</span>
+ layout: post
+ title: <span class="s1">'Welcome to Jekyll!'</span>
+ <span class="nb">date</span>: 2021-04-01 08-08-08 +0700
+ catergories: jekyll update
+ <span class="nt">---</span>
+</code></pre></div>    </div>
+
+    <p>Dibawah Front Matter tersebut baru di ketik isi post yang mau dibuat, panduan markdown bisa dibaca di <a href="https://www.markdownguide.org/">Markdown Guide</a></p>
+  </li>
+  <li>
+    <p>Publish website ke GitHub Page</p>
+
+    <p>Setelah website selesai di konfigurasi di lokal selanjutnya publish website tersebut ke GitHub Page, caranya sebagai berikut :</p>
+    <ol>
+      <li>Login ke Github</li>
+      <li>Buat repository dengan nama username diikuti <em>.github.io</em>, contoh : <a href="https://danynotes.github.io/">danynotes.github.io</a>, set sebagai public repository</li>
+      <li>Copy link repository tersebut</li>
+      <li>
+        <p>Init git dan add remote repository di folder website komputer</p>
+
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> git init
+ git remote add github url_repository_remote
+ git add <span class="nt">--all</span>
+ git commit <span class="nt">-m</span> <span class="s1">'initial commit'</span>
+ git push <span class="nt">-u</span> github master
+</code></pre></div>        </div>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<p>Dan proses buat website statis dengan jekyll sudah jadi, buka browser dan check https://<em>usename</em>.github.io.</p>
+
+<p>Kalau mau tampilan blog lebih menarik dari theme default jekyll. coba cari di <a href="https://rubygems.org/search?utf8=%E2%9C%93&amp;query=jekyll-theme">jekyll theme on rubygems.org</a> atau di <a href="http://jekyllthemes.org/">jekyllthemes.org</a>. Download dan override di folder website eksisting
+atau lakukan <em>fork</em> dari repositori asal theme yang diinginkan.</p>

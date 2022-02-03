@@ -1,0 +1,305 @@
+<p>MS Access can be used to design a database because it has relationship diagram tools that can be used to create tables relations and test them directly. The problem is how if I need to develop an application in PostgreSQL, I can easily find many online converters available on the internet but they are not friendly for the wallet, so I need to make the conversion from MSAccess to PostgreSQL.</p>
+
+<h2 id="preparing-ms-access">Preparing MS Access</h2>
+
+<ol>
+  <li>Grant read access for Admin role to read relationship/foreign key information by executing scripts below in MSAccess Immediate panel.
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ?CurrentUser
+ CurrentProject.Connection.Execute <span class="s2">"GRANT SELECT ON MSysRelationships TO Admin"</span>
+</code></pre></div>    </div>
+
+    <p>To open Immediate panel : Open Ms Access file, click Database tools Menu - Visual Basic - click view - and then Immediate Windows.</p>
+
+    <p><img src="https://lh3.googleusercontent.com/-G6lu79Byapk/YHuOkcOWpqI/AAAAAAAAUik/KWcd-zKBkg8wl_lu_3b-u8sR74u-yeaGQCLcBGAsYHQ/s16000/image.png" alt="Immediate_Panel" /></p>
+  </li>
+</ol>
+
+<h2 id="create-code-with-python">Create code with python</h2>
+
+<p>Because we need Microsoft Access Driver, so these scripts only running in Windows.</p>
+<ol>
+  <li>Step 1:Create virtual environment and install this requirements :
+    <ul>
+      <li>pyodbc 4.0.30</li>
+      <li>psycopg2 2.8.6</li>
+    </ul>
+  </li>
+  <li>
+    <p>Step 2:Import module, specify the parameters and create MSAccess connection, below the parameter needed :</p>
+
+    <p>mdb_file    : MS Access file name include complete file location<br />
+ pg_host     : PostgreSQL Host/IP server<br />
+ pg_db       : PostgreSQL database name<br />
+ pg_user     : PostgreSQL username<br />
+ pg_password : PostgreSQL password<br />
+ print_SQL   : Optional to print on screen SQL dump</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">import</span> <span class="nn">os</span>
+ <span class="kn">import</span> <span class="nn">pyodbc</span>
+ <span class="kn">import</span> <span class="nn">psycopg2</span>
+ <span class="kn">import</span> <span class="nn">sys</span>
+
+ <span class="k">class</span> <span class="nc">mdb2psql</span><span class="p">:</span>
+
+     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mdb_file</span><span class="p">,</span> <span class="n">pg_host</span><span class="p">,</span> <span class="n">pg_db</span><span class="p">,</span> <span class="n">pg_user</span><span class="p">,</span> <span class="n">pg_password</span><span class="p">,</span> <span class="n">print_SQL</span><span class="p">):</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">access_cursor</span> <span class="o">=</span> <span class="n">pyodbc</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="sa">f</span><span class="s">'Driver=;DBQ=</span><span class="si">{</span><span class="n">mdb_file</span><span class="si">}</span><span class="s">;'</span><span class="p">).</span><span class="n">cursor</span><span class="p">()</span>
+        
+         <span class="bp">self</span><span class="p">.</span><span class="n">schema_name</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">get_access_dbname</span><span class="p">()</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">print_SQL</span> <span class="o">=</span> <span class="n">print_SQL</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_user</span> <span class="o">=</span> <span class="n">pg_user</span>
+
+         <span class="bp">self</span><span class="p">.</span><span class="n">param_dic</span> <span class="o">=</span> <span class="p">{</span>
+             <span class="s">"host"</span>      <span class="p">:</span> <span class="n">pg_host</span><span class="p">,</span>
+             <span class="s">"database"</span>  <span class="p">:</span> <span class="n">pg_db</span><span class="p">,</span>
+             <span class="s">"user"</span>      <span class="p">:</span> <span class="n">pg_user</span><span class="p">,</span>
+             <span class="s">"password"</span>  <span class="p">:</span> <span class="n">pg_password</span>
+         <span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Step 3:Get Ms Access Database Name
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="k">def</span> <span class="nf">get_access_dbname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">access_cursor</span><span class="p">.</span><span class="n">tables</span><span class="p">():</span>
+             <span class="k">return</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">basename</span><span class="p">(</span><span class="n">table</span><span class="p">.</span><span class="n">table_cat</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Step 4:Create PostgreSQL connection</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>         <span class="bp">self</span><span class="p">.</span><span class="n">pg_conn</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">pg_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">param_dic</span><span class="p">)</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">pg_conn</span><span class="p">.</span><span class="n">cursor</span><span class="p">()</span>
+
+     <span class="k">def</span> <span class="nf">pg_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_dic</span><span class="p">):</span>
+         <span class="n">pg_conn</span> <span class="o">=</span> <span class="bp">None</span>
+         <span class="k">try</span><span class="p">:</span>
+             <span class="k">print</span><span class="p">(</span><span class="s">'Connecting to the PostgreSql database...'</span><span class="p">)</span>
+             <span class="n">pg_conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="o">**</span><span class="n">params_dic</span><span class="p">)</span>
+         <span class="k">except</span> <span class="p">(</span><span class="nb">Exception</span><span class="p">,</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">DatabaseError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+             <span class="k">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+             <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+         <span class="k">return</span> <span class="n">pg_conn</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Step 5:Create schema on PostgreSQL server</p>
+
+    <p>After getting MS Access schema, then create it on PostgreSQL</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="k">def</span> <span class="nf">create_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="n">str_SQL</span> <span class="o">=</span> <span class="s">'DROP SCHEMA IF EXISTS {schema_name} CASCADE; CREATE SCHEMA {schema_name};'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">schema_name</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">schema_name</span><span class="p">)</span>
+    
+         <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">print_SQL</span><span class="p">:</span>
+             <span class="k">print</span><span class="p">(</span><span class="n">str_SQL</span><span class="p">)</span>
+        
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">str_SQL</span><span class="p">)</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_conn</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+
+         <span class="bp">self</span><span class="p">.</span><span class="n">create_tables</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Step 6:Create tables on PostgreSQL server</p>
+
+    <p>On the last line of the create_schema method, let’s call the create_tables method. In the create_tables method, we collect the tables from MS Access into a list, which will be used for looping to get the fields in each table.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="k">def</span> <span class="nf">create_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="n">table_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">access_cursor</span><span class="p">.</span><span class="n">tables</span><span class="p">(</span><span class="n">tableType</span><span class="o">=</span><span class="s">'TABLE'</span><span class="p">):</span>
+             <span class="n">table_list</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">.</span><span class="n">table_name</span><span class="p">)</span>
+
+         <span class="n">psql</span> <span class="o">=</span> <span class="s">''</span>
+         <span class="n">str_table_independent</span> <span class="o">=</span> <span class="s">''</span>
+         <span class="n">str_table_dependent</span> <span class="o">=</span> <span class="s">''</span>
+         <span class="n">table_independent</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+         <span class="n">table_dependent</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+         <span class="n">table_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">table_list</span><span class="p">:</span>
+             <span class="n">str_SQL</span> <span class="o">=</span> <span class="s">''</span>
+             <span class="n">str_SQL</span> <span class="o">=</span> <span class="s">'DROP TABLE IF EXISTS {schema_name}.{table} CASCADE;</span><span class="se">\n</span><span class="s">'</span> \
+                 <span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">schema_name</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">schema_name</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="p">)</span>
+             <span class="n">str_SQL</span> <span class="o">+=</span> <span class="s">'CREATE TABLE {schema_name}.{table} (</span><span class="se">\n</span><span class="s">'</span> \
+                 <span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">schema_name</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">schema_name</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="p">)</span>
+             <span class="n">str_SQL</span> <span class="o">+=</span> <span class="bp">self</span><span class="p">.</span><span class="n">create_fields</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+</code></pre></div>    </div>
+    <p>After getting the query string to create fields, then before the create_table query executed in PostgreSQL, the execution query’s arrangement to create the table in PostgreSQL need to be made an independent’s table first to be executed, then the dependent’s table.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+         <span class="c1"># collecting str query to create independent tables first
+</span>         <span class="k">if</span> <span class="s">'FOREIGN KEY'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">str_SQL</span><span class="p">:</span>
+             <span class="n">str_table_independent</span> <span class="o">+=</span> <span class="n">str_SQL</span>
+             <span class="n">table_independent</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+         <span class="k">else</span><span class="p">:</span>
+             <span class="n">str_table_dependent</span> <span class="o">+=</span> <span class="n">str_SQL</span>
+             <span class="n">table_dependent</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+
+         <span class="n">psql</span> <span class="o">=</span> <span class="n">str_table_independent</span> <span class="o">+</span> <span class="n">str_table_dependent</span> 
+         <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">print_SQL</span><span class="p">:</span>
+             <span class="k">print</span><span class="p">(</span><span class="n">psql</span><span class="p">)</span>
+
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">psql</span><span class="p">)</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_conn</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+        
+         <span class="n">table_order</span> <span class="o">=</span> <span class="n">table_independent</span> <span class="o">+</span> <span class="n">table_dependent</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">insert_data</span><span class="p">(</span><span class="n">table_order</span><span class="p">)</span>
+</code></pre></div>    </div>
+    <p>In the create_fields method, it will collect column name, column size, transform column type and get foreign key relationship/information by executing the hidden MSAccess system table below.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">select </span>sZObject, sZreferencedColumn, sZReferencedObject, sZRelationship from MSysRelationships where <span class="nv">szObject</span><span class="o">=</span>?<span class="s2">", table
+</span></code></pre></div>    </div>
+
+    <p>which will return the following information:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> * ccolumn  
+ * grbit  
+ * icolumn  
+ * szColumn  
+ * szObject # table_name  
+ * sZReferencedColumn # field_reference  
+ * sZReferencedObject # table_reference  
+ * sZRelationship # relationship_name
+</code></pre></div>    </div>
+
+    <p>With those information it can be use to get table reference and the foreign key name.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="k">def</span> <span class="nf">create_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+         <span class="n">postgresql_fields</span> <span class="o">=</span> <span class="p">{</span>
+             <span class="s">'COUNTER'</span><span class="p">:</span> <span class="s">'serial PRIMARY KEY'</span><span class="p">,</span> <span class="c1"># autoincrement
+</span>             <span class="s">'VARCHAR'</span><span class="p">:</span> <span class="s">'varchar'</span><span class="p">,</span> <span class="c1"># text
+</span>             <span class="s">'LONGCHAR'</span><span class="p">:</span> <span class="s">'varchar'</span><span class="p">,</span> <span class="c1"># text
+</span>             <span class="s">'BYTE'</span><span class="p">:</span> <span class="s">'smallint'</span><span class="p">,</span>  <span class="c1"># byte
+</span>             <span class="s">'INTEGER'</span><span class="p">:</span> <span class="s">'int'</span><span class="p">,</span>  <span class="c1"># integer
+</span>             <span class="s">'LONG INTEGER'</span><span class="p">:</span> <span class="s">'bigint'</span><span class="p">,</span>  <span class="c1"># long integer
+</span>             <span class="s">'REAL'</span><span class="p">:</span> <span class="s">'real'</span><span class="p">,</span> <span class="c1"># single
+</span>             <span class="s">'DOUBLE'</span><span class="p">:</span> <span class="s">'double precision'</span><span class="p">,</span> <span class="c1"># double
+</span>             <span class="s">'DATETIME'</span><span class="p">:</span> <span class="s">'timestamp'</span><span class="p">,</span> <span class="c1"># date/time
+</span>             <span class="s">'CURRENCY'</span><span class="p">:</span> <span class="s">'money'</span><span class="p">,</span> <span class="c1"># currency 
+</span>             <span class="s">'BIT'</span><span class="p">:</span> <span class="s">'boolean'</span><span class="p">,</span> <span class="c1"># yes/no
+</span>         <span class="p">}</span>
+
+         <span class="n">foreign_keys</span><span class="o">=</span> <span class="s">''</span>
+         <span class="n">foreign_keys_exist</span> <span class="o">=</span> <span class="p">{}</span>
+         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">access_cursor</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="s">"select sZObject, sZreferencedColumn, sZReferencedObject, sZRelationship from MSysRelationships where szObject=?"</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+             <span class="n">foreign_key</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+             <span class="n">table_reference</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+             <span class="k">if</span> <span class="n">foreign_keys_exist</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                 <span class="n">foreign_keys_exist</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">True</span>
+                 <span class="n">foreign_keys</span> <span class="o">=</span> <span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">foreign_keys</span><span class="si">}</span><span class="s"> FOREIGN KEY (</span><span class="si">{</span><span class="n">foreign_key</span><span class="si">}</span><span class="s">) REFERENCES </span><span class="si">{</span><span class="bp">self</span><span class="p">.</span><span class="n">schema_name</span><span class="si">}</span><span class="s">.</span><span class="si">{</span><span class="n">table_reference</span><span class="si">}</span><span class="s"> (</span><span class="si">{</span><span class="n">foreign_key</span><span class="si">}</span><span class="s">) ON DELETE CASCADE,</span><span class="se">\n</span><span class="s">'</span>
+
+         <span class="n">foreign_keys</span> <span class="o">=</span> <span class="n">foreign_keys</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+         <span class="k">if</span> <span class="n">foreign_keys</span> <span class="o">!=</span> <span class="s">''</span><span class="p">:</span>
+             <span class="n">foreign_keys</span> <span class="o">=</span> <span class="sa">f</span><span class="s">'</span><span class="se">\n</span><span class="s">, </span><span class="si">{</span><span class="n">foreign_keys</span><span class="si">}</span><span class="s">'</span>
+
+         <span class="n">str_SQL</span> <span class="o">=</span><span class="s">''</span>
+         <span class="n">field_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">access_cursor</span><span class="p">.</span><span class="n">columns</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="p">):</span>
+             <span class="k">if</span> <span class="n">column</span><span class="p">.</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">postgresql_fields</span><span class="p">:</span>
+                 <span class="n">field_list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">column</span><span class="p">.</span><span class="n">column_name</span> <span class="o">+</span> <span class="s">" "</span> <span class="o">+</span> <span class="n">postgresql_fields</span><span class="p">[</span><span class="n">column</span><span class="p">.</span><span class="n">type_name</span><span class="p">],]</span>
+             <span class="k">elif</span> <span class="n">column</span><span class="p">.</span><span class="n">type_name</span> <span class="o">==</span> <span class="s">'DECIMAL'</span><span class="p">:</span>
+                 <span class="n">field_list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">column</span><span class="p">.</span><span class="n">column_name</span> <span class="o">+</span>
+                             <span class="s">' numeric('</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column</span><span class="p">.</span><span class="n">column_size</span><span class="p">)</span> <span class="o">+</span> <span class="s">","</span> <span class="o">+</span>
+                             <span class="nb">str</span><span class="p">(</span><span class="n">column</span><span class="p">.</span><span class="n">decimal_digits</span><span class="p">)</span> <span class="o">+</span> <span class="s">")"</span><span class="p">,</span> <span class="p">]</span>
+             <span class="k">else</span><span class="p">:</span>
+                 <span class="k">print</span><span class="p">(</span><span class="s">"column "</span> <span class="o">+</span> <span class="n">table</span> <span class="o">+</span> <span class="s">"."</span> <span class="o">+</span> <span class="n">column</span><span class="p">.</span><span class="n">column_name</span> <span class="o">+</span>
+                 <span class="s">" has uncatered for type: "</span> <span class="o">+</span> <span class="n">column</span><span class="p">.</span><span class="n">type_name</span><span class="p">)</span>
+
+         <span class="k">return</span> <span class="s">','</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">field_list</span><span class="p">)</span>  <span class="o">+</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span> <span class="o">+</span> <span class="n">foreign_keys</span> <span class="o">+</span> <span class="s">');</span><span class="se">\n</span><span class="s">'</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Step 7:Inserting data</p>
+
+    <p>After database schema and tables created now turn to inserting data.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="k">def</span> <span class="nf">insert_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_list</span><span class="p">):</span>
+
+         <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">table_list</span><span class="p">:</span>
+             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">get_msaccess_data</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+
+             <span class="k">if</span> <span class="n">data</span> <span class="o">!=</span> <span class="p">[]:</span>
+                 <span class="n">format_string</span> <span class="o">=</span> <span class="s">'('</span> <span class="o">+</span> <span class="s">','</span><span class="p">.</span><span class="n">join</span><span class="p">([</span><span class="s">'%s'</span><span class="p">,</span> <span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">+</span> <span class="s">')</span><span class="se">\n</span><span class="s">'</span>
+                 <span class="c1"># pre-bind the arguments before executing - for speed
+</span>                 <span class="n">args_string</span> <span class="o">=</span> <span class="s">','</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span><span class="p">.</span><span class="n">mogrify</span><span class="p">(</span><span class="n">format_string</span><span class="p">,</span> <span class="n">x</span><span class="p">).</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span>
+                 <span class="n">column</span> <span class="o">=</span> <span class="s">','</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">table</span><span class="p">)))</span>
+                 <span class="n">str_SQL</span> <span class="o">=</span> <span class="s">"INSERT INTO %s(%s) VALUES "</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">schema_name</span> <span class="o">+</span> <span class="s">'.'</span> <span class="o">+</span> <span class="n">table</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span> <span class="o">+</span> <span class="n">args_string</span>
+
+                 <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">print_SQL</span><span class="p">:</span>
+                     <span class="k">print</span><span class="p">(</span><span class="s">'INSERT INTO {schema_name}.{table_name} VALUES {value_list}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">schema_name</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">schema_name</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table</span><span class="p">,</span> <span class="n">value_list</span><span class="o">=</span><span class="n">args_string</span><span class="p">))</span>
+
+                
+                 <span class="k">try</span><span class="p">:</span>
+                     <span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">str_SQL</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                     <span class="bp">self</span><span class="p">.</span><span class="n">pg_conn</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+                 <span class="k">except</span> <span class="p">(</span><span class="nb">Exception</span><span class="p">,</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">DatabaseError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                     <span class="k">print</span><span class="p">(</span><span class="s">"Error: %s"</span> <span class="o">%</span> <span class="n">error</span><span class="p">)</span>
+                     <span class="bp">self</span><span class="p">.</span><span class="n">pg_conn</span><span class="p">.</span><span class="n">rollback</span><span class="p">()</span>
+                     <span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+                     <span class="k">return</span> <span class="mi">1</span>
+                 <span class="k">print</span><span class="p">(</span><span class="s">"Execute() done"</span><span class="p">)</span>
+            
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+     <span class="k">def</span> <span class="nf">get_msaccess_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+         <span class="n">str_SQL</span> <span class="o">=</span> <span class="s">'SELECT * FROM [{table_name}]'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">table_name</span><span class="o">=</span><span class="n">table</span><span class="p">)</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">access_cursor</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">str_SQL</span><span class="p">)</span>
+         <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">access_cursor</span><span class="p">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+         <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+          
+         <span class="k">return</span> <span class="n">data</span>
+
+     <span class="k">def</span> <span class="nf">get_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+         <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">access_cursor</span><span class="p">.</span><span class="n">columns</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="p">):</span>
+             <span class="n">columns</span> <span class="o">+=</span> <span class="n">column</span><span class="p">.</span><span class="n">column_name</span><span class="p">,</span> 
+    
+         <span class="k">return</span> <span class="n">columns</span>
+</code></pre></div>    </div>
+    <p>In the insert_data method, it will call a list of tables that have been arranged sequentially from table independent to table dependent and then and then pull MS Access data, bind it to arguments and return a query string using mogrify().</p>
+  </li>
+  <li>
+    <p>Step 8:Execute the code</p>
+
+    <p>To execute class mdb2psql I create new class for input parameter and run mdb2psql class.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">import</span> <span class="nn">mdb2psql</span>
+ <span class="kn">import</span> <span class="nn">click</span>
+ <span class="kn">import</span> <span class="nn">sys</span>
+ <span class="kn">import</span> <span class="nn">os</span>
+
+
+ <span class="o">@</span><span class="n">click</span><span class="p">.</span><span class="n">command</span><span class="p">()</span>
+ <span class="o">@</span><span class="n">click</span><span class="p">.</span><span class="n">option</span><span class="p">(</span><span class="s">'--mdbfile'</span><span class="p">,</span> 
+     <span class="n">prompt</span><span class="o">=</span><span class="s">"Full path of MS Access Source file"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Full path of MS Access source file"</span><span class="p">)</span>
+ <span class="o">@</span><span class="n">click</span><span class="p">.</span><span class="n">option</span><span class="p">(</span><span class="s">'--psql_host'</span><span class="p">,</span> 
+     <span class="n">prompt</span><span class="o">=</span><span class="s">"PostgreSQL IP server"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"PostgreSQL ip server"</span><span class="p">)</span>
+ <span class="o">@</span><span class="n">click</span><span class="p">.</span><span class="n">option</span><span class="p">(</span><span class="s">'--psql_db'</span><span class="p">,</span> 
+     <span class="n">prompt</span><span class="o">=</span><span class="s">"PostgreSQL Database Name"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Database Name"</span><span class="p">)</span>
+ <span class="o">@</span><span class="n">click</span><span class="p">.</span><span class="n">option</span><span class="p">(</span><span class="s">'--psql_user'</span><span class="p">,</span> 
+     <span class="n">prompt</span><span class="o">=</span><span class="s">"PostgreSQL user"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"PostgreSQL user"</span><span class="p">)</span>
+ <span class="o">@</span><span class="n">click</span><span class="p">.</span><span class="n">option</span><span class="p">(</span><span class="s">'--print_query'</span><span class="p">,</span> 
+     <span class="n">prompt</span><span class="o">=</span><span class="s">"View sqldump "</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"show sql dump to sql"</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+ <span class="k">def</span> <span class="nf">convert_mdb_to_psql</span><span class="p">(</span><span class="n">mdbfile</span><span class="p">,</span> <span class="n">psql_host</span><span class="p">,</span> <span class="n">psql_db</span><span class="p">,</span> <span class="n">psql_user</span><span class="p">,</span> <span class="n">psql_pass</span><span class="p">,</span> <span class="n">print_query</span><span class="p">):</span>
+     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mdbfile</span><span class="p">):</span>
+         <span class="n">click</span><span class="p">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s">'File not exist: </span><span class="si">{</span><span class="n">mdbfile</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+         <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+     <span class="n">click</span><span class="p">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s">'Generate </span><span class="si">{</span><span class="n">mdbfile</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+        
+     <span class="n">convert_data</span> <span class="o">=</span> <span class="n">mdb2psql</span><span class="p">.</span><span class="n">mdb2psql</span><span class="p">(</span><span class="n">mdbfile</span><span class="p">,</span> <span class="n">psql_host</span><span class="p">,</span> <span class="n">psql_db</span><span class="p">,</span> <span class="n">psql_user</span><span class="p">,</span> <span class="n">psql_pass</span><span class="p">,</span> <span class="n">print_query</span><span class="p">)</span>
+     <span class="n">convert_data</span><span class="p">.</span><span class="n">create_schema</span><span class="p">()</span>
+
+ <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+     <span class="n">convert_mdb_to_psql</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="result">Result</h2>
+<p>This figure show the query results :</p>
+
+<p><img src="https://1.bp.blogspot.com/-XYkZXzg1eTk/YH0DV_CzEbI/AAAAAAAAUi0/64uKBGT5bTMli267JVBij_QnLVS3bu9pgCLcBGAsYHQ/s1266/msaccess_to_psql_result_dump.png" alt="msaccess-to-postgresql-converter" /></p>
+
+<p>and this figure, when it’s checked with DBeaver.</p>
+
+<p><img src="https://1.bp.blogspot.com/-vYuWI2W6JJ4/YHz2Mleg6TI/AAAAAAAAUis/PKuAX9YrIKkAD7IvGgXgYWrmEUm114umgCLcBGAsYHQ/s1916/msaccess_to_psql_result.png" alt="MSAccess to PostgreSQL convertion result" /></p>

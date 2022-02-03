@@ -1,0 +1,207 @@
+<p>Setelah model jadi pada <a href="/data%20science/2021/07/19/customer-segmentation-with-python-part4">part-4</a>, selanjutnya tahap mengoperasikan model.</p>
+
+<h1 id="mengoperasikan-model">Mengoperasikan Model</h1>
+
+<p>Model yang telah dibuat harus bisa digunakan untuk memprediksi data baru. Untuk itu harus dipersiapkan datanya kembali dan kemudian melakukan prediksi dengan parameter dan model yang sudah di buat.</p>
+
+<p>Jika model dapat dioperasionalkan, maka tim bisnis dapat dengan ceat mengetahui segmen dari pelanggan dan juga bisa mengatur strategi marketing dengan lebih efisien.</p>
+
+<h2 id="persiapkan-data-baru">Persiapkan Data Baru</h2>
+
+<p>Buat data baru untuk diprediksikan dengan model yang telah dibuat</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Data Baru  
+</span><span class="n">data</span> <span class="o">=</span> <span class="p">[{</span>  
+    <span class="s">'Customer_ID'</span><span class="p">:</span> <span class="s">'CUST-100'</span> <span class="p">,</span>  
+    <span class="s">'Nama Pelanggan'</span><span class="p">:</span> <span class="s">'Joko'</span> <span class="p">,</span>  
+    <span class="s">'Jenis Kelamin'</span><span class="p">:</span> <span class="s">'Pria'</span><span class="p">,</span>  
+    <span class="s">'Umur'</span><span class="p">:</span> <span class="mi">45</span><span class="p">,</span>  
+    <span class="s">'Profesi'</span><span class="p">:</span> <span class="s">'Wiraswasta'</span><span class="p">,</span>  
+    <span class="s">'Tipe Residen'</span><span class="p">:</span> <span class="s">'Cluster'</span> <span class="p">,</span>  
+    <span class="s">'NilaiBelanjaSetahun'</span><span class="p">:</span> <span class="mi">8230000</span>  
+      
+<span class="p">}]</span>  
+  
+<span class="c1"># Membuat Data Frame  
+</span><span class="n">new_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  
+  
+<span class="c1"># Melihat Data  
+</span><span class="k">print</span><span class="p">(</span><span class="n">new_df</span><span class="p">)</span>  
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Customer_ID Nama Pelanggan Jenis Kelamin  Umur     Profesi Tipe Residen  \
+0    CUST-100           Joko          Pria    45  Wiraswasta      Cluster   
+
+   NilaiBelanjaSetahun  
+0              8230000  
+</code></pre></div></div>
+
+<h2 id="membuat-fungsi-data-pemrosesan">Membuat fungsi data pemrosesan</h2>
+
+<p>Selanjutnya perlu dibuat fungsi untuk melakukan pemrosesan data berdasarkan parameter yang sama pada saat melakukan permodelan dan dipanggil dengan data baru.</p>
+
+<p>Fungsi yang dibuat akan digunakan untuk :
+<em>1. Melakukan konversi data kategorikal menjadi numerik</em></p>
+
+<p>Dari proses sebelumnya didapatkan referensi untuk merubah data kategorikal menjadi numerik, sebagai berikut :</p>
+
+<ul>
+  <li>
+    <p>Jenis Kelamin<br />
+0 : Pria
+1 : Wanita</p>
+  </li>
+  <li>
+    <p>Profesi
+0 : Ibu Rumah Tangga
+1 : Mahasiswa
+2 : Pelajar
+3 : Professional
+4 : Wiraswasta</p>
+  </li>
+  <li>
+    <p>Tipe Residen
+1 : Sector
+0 : Cluster</p>
+  </li>
+</ul>
+
+<p><em>2. Melakukan standarisasi kolom numerikal</em></p>
+
+<p>Untuk melakukan standarisasi dengan variable yang sama pada saat permodelan perlu menggunakan nilai rata-rata dan standard deviasi dari tiap variable pada saat kita melakukan permodelan, yaitu :</p>
+
+<p><em>Umur</em> :</p>
+<ul>
+  <li>Rata-rata : 37.5</li>
+  <li>Standard deviasi : 14.7</li>
+</ul>
+
+<p><em>NilaiBelanjaSetahun</em></p>
+<ul>
+  <li>Rata-rata : 7069874.8</li>
+  <li>Standart deviasi :2590619.0</li>
+</ul>
+
+<p>Dari nilai tersebut dapat dihitung nilai standardisasi (z) dengan menggunakan rumus Z=(x-u)/s dengan x adalah tiap nilai, u adalah rata-rata dan s adalah standart deviasi.</p>
+
+<p><em>3. Menggabungkan hasil dua proses sebelumnya menjadi satu data frame</em></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">data_preprocess</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>  
+    <span class="c1"># Konversi Kategorikal data  
+</span>    <span class="n">kolom_kategorikal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Jenis Kelamin'</span><span class="p">,</span><span class="s">'Profesi'</span><span class="p">,</span><span class="s">'Tipe Residen'</span><span class="p">]</span>
+      
+    <span class="n">df_encode</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">kolom_kategorikal</span><span class="p">].</span><span class="n">copy</span><span class="p">()</span>  
+  
+    <span class="c1">## Jenis Kelamin   
+</span>    <span class="n">df_encode</span><span class="p">[</span><span class="s">'Jenis Kelamin'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_encode</span><span class="p">[</span><span class="s">'Jenis Kelamin'</span><span class="p">].</span><span class="nb">map</span><span class="p">({</span>  
+        <span class="s">'Pria'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  
+        <span class="s">'Wanita'</span> <span class="p">:</span> <span class="mi">1</span>  
+    <span class="p">})</span>  
+      
+    <span class="c1">## Profesi  
+</span>    <span class="n">df_encode</span><span class="p">[</span><span class="s">'Profesi'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_encode</span><span class="p">[</span><span class="s">'Profesi'</span><span class="p">].</span><span class="nb">map</span><span class="p">({</span>  
+        <span class="s">'Ibu Rumah Tangga'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  
+        <span class="s">'Mahasiswa'</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  
+        <span class="s">'Pelajar'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>  
+        <span class="s">'Professional'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>  
+        <span class="s">'Wiraswasta'</span><span class="p">:</span> <span class="mi">4</span>  
+    <span class="p">})</span>  
+      
+    <span class="c1">## Tipe Residen  
+</span>    <span class="n">df_encode</span><span class="p">[</span><span class="s">'Tipe Residen'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_encode</span><span class="p">[</span><span class="s">'Tipe Residen'</span><span class="p">].</span><span class="nb">map</span><span class="p">({</span>  
+        <span class="s">'Cluster'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  
+        <span class="s">'Sector'</span> <span class="p">:</span> <span class="mi">1</span>  
+    <span class="p">})</span>  
+      
+    <span class="c1"># Standardisasi Numerical Data  
+</span>    <span class="n">kolom_numerik</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Umur'</span><span class="p">,</span><span class="s">'NilaiBelanjaSetahun'</span><span class="p">]</span>  
+    <span class="n">df_std</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">kolom_numerik</span><span class="p">].</span><span class="n">copy</span><span class="p">()</span>  
+      
+    <span class="c1">## Standardisasi Kolom Umur  
+</span>    <span class="n">df_std</span><span class="p">[</span><span class="s">'Umur'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_std</span><span class="p">[</span><span class="s">'Umur'</span><span class="p">]</span> <span class="o">-</span> <span class="mf">37.5</span><span class="p">)</span><span class="o">/</span><span class="mf">14.7</span>  
+      
+    <span class="c1">## Standardisasi Kolom Nilai Belanja Setahun  
+</span>    <span class="n">df_std</span><span class="p">[</span><span class="s">'NilaiBelanjaSetahun'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_std</span><span class="p">[</span><span class="s">'NilaiBelanjaSetahun'</span><span class="p">]</span> <span class="o">-</span> <span class="mf">7069874.8</span><span class="p">)</span><span class="o">/</span><span class="mf">2590619.0</span>  
+      
+    <span class="c1"># Menggabungkan Kategorikal dan numerikal data  
+</span>    <span class="n">df_model</span> <span class="o">=</span> <span class="n">df_encode</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_std</span><span class="p">,</span> <span class="n">left_index</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>  
+                           <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s">'left'</span><span class="p">)</span>  
+      
+    <span class="k">return</span> <span class="n">df_model</span>  
+  
+<span class="c1"># Menjalankan fungsi  
+</span><span class="n">new_df_model</span> <span class="o">=</span> <span class="n">data_preprocess</span><span class="p">(</span><span class="n">new_df</span><span class="p">)</span>  
+  
+<span class="k">print</span><span class="p">(</span><span class="n">new_df_model</span><span class="p">)</span> 
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   Jenis Kelamin  Profesi  Tipe Residen      Umur  NilaiBelanjaSetahun
+0              0        4             0  0.510204             0.447818
+</code></pre></div></div>
+
+<h2 id="memanggil-model-dan-melakukan-prediksi">Memanggil Model dan melakukan prediksi</h2>
+<p>Setelah memiliki data yang siap digunakan saatnya memanggil model yang sudah di simpan sebelumnya dan melakukan prediksi.</p>
+
+<p>Untuk melakukan hal tersebut, perlu dibuat prosesnya menjadi dalam satu fungsi yang bernama modelling dengan menggunakan data baru sebagai inputnya.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">modelling</span> <span class="p">(</span><span class="n">data</span><span class="p">):</span>  
+      
+    <span class="c1"># Memanggil Model  
+</span>    <span class="n">kpoto</span> <span class="o">=</span> <span class="n">pickle</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">'cluster.pkl'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">))</span>  
+      
+    <span class="c1"># Melakukan Prediksi  
+</span>    <span class="n">clusters</span> <span class="o">=</span> <span class="n">kpoto</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">categorical</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>  
+      
+    <span class="k">return</span> <span class="n">clusters</span>  
+  
+<span class="c1"># Menjalankan Fungsi  
+</span><span class="n">clusters</span> <span class="o">=</span> <span class="n">modelling</span><span class="p">(</span><span class="n">new_df_model</span><span class="p">)</span>  
+  
+<span class="k">print</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>  
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[3]
+</code></pre></div></div>
+
+<h2 id="menamakan-segmen">Menamakan Segmen</h2>
+<p>Seperti proses sebelumnya, untuk melakukan ini perlu dibuatkan fungsi. Nama cluster yang sudah didapat di tahap sebelumnya perlu diubah menjadi nama segmen agar lebih mudah diidentifikasi.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">menamakan_segmen</span> <span class="p">(</span><span class="n">data_asli</span><span class="p">,</span> <span class="n">clusters</span><span class="p">):</span>  
+      
+    <span class="c1"># Menggabungkan cluster dan data asli  
+</span>    <span class="n">final_df</span> <span class="o">=</span> <span class="n">data_asli</span><span class="p">.</span><span class="n">copy</span><span class="p">()</span>  
+    <span class="n">final_df</span><span class="p">[</span><span class="s">'cluster'</span><span class="p">]</span> <span class="o">=</span> <span class="n">clusters</span>
+      
+    <span class="c1"># Menamakan segmen  
+</span>    <span class="n">final_df</span><span class="p">[</span><span class="s">'segmen'</span><span class="p">]</span> <span class="o">=</span> <span class="n">final_df</span><span class="p">[</span><span class="s">'cluster'</span><span class="p">].</span><span class="nb">map</span><span class="p">({</span>  
+        <span class="mi">0</span><span class="p">:</span> <span class="s">'Diamond Young Member'</span><span class="p">,</span>  
+        <span class="mi">1</span><span class="p">:</span> <span class="s">'Diamond Senior Member'</span><span class="p">,</span>  
+        <span class="mi">2</span><span class="p">:</span> <span class="s">'Silver Students'</span><span class="p">,</span>  
+        <span class="mi">3</span><span class="p">:</span> <span class="s">'Gold Young Member'</span><span class="p">,</span>  
+        <span class="mi">4</span><span class="p">:</span> <span class="s">'Gold Senior Member'</span>  
+    <span class="p">})</span>  
+      
+    <span class="k">return</span> <span class="n">final_df</span>
+  
+<span class="c1"># Menjalankan Fungsi  
+</span><span class="n">new_final_df</span> <span class="o">=</span> <span class="n">menamakan_segmen</span><span class="p">(</span><span class="n">new_df</span><span class="p">,</span><span class="n">clusters</span><span class="p">)</span>  
+  
+<span class="k">print</span><span class="p">(</span><span class="n">new_final_df</span><span class="p">)</span>  
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Customer_ID Nama Pelanggan Jenis Kelamin  Umur     Profesi Tipe Residen  \
+0    CUST-100           Joko          Pria    45  Wiraswasta      Cluster   
+
+   NilaiBelanjaSetahun  cluster             segmen  
+0              8230000        3  Gold Young Member  
+</code></pre></div></div>
+
+<h2 id="kesimpulan">Kesimpulan</h2>
+<p>Akhirnya, alur proses untuk mengoperasikan model sudah selesai dibuat. Selanjutnya penggunakan kode ini dapat dijadwalkan atau akan dijalankan secara real-time setiap ada data masuk atau secara batch misal satu hari sekali.</p>
+
+<p><em>Tips:</em></p>
+
+<p>Di industri khususnya untuk mengorperasikan model bisa bermacam-macam caranya. Ada yang membuat dengan python script lalu di buat interval jam jalan nya. Selain itu bisa juga menggunakan bantuan software untuk melakukan deployment.</p>

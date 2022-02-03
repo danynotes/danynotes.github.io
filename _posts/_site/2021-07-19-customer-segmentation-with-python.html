@@ -1,0 +1,92 @@
+<h1 id="data-science-in-marketing-customer-segmentation-with-python">Data Science in Marketing: Customer Segmentation with Python</h1>
+
+<p>Salah satu teknik yang bisa dilakukan untuk mengenal pelanggan lebih baik adalah dengan melakukan segmentasi pelanggan. Yaitu dengan mengelompokkan pelanggan-pelanggan yang ada berdasarkan kesamaan karakter dari pelanggan tersebut. Untuk melakukan hal tersebut gunakan teknik unsupervised machine learning.</p>
+
+<p><em>Salah satu teknik yang dapat digunakan adalah mengaplikasikan machine learning menggunakan algorima K-Prototypes. Algorima K-Prototypes merupakan gabungan dari K-Means dan K-Modes yang dapat digunakan untuk melakukan segmentasi dengan data</em>.</p>
+
+<p>Data yang digunakan saat ini memiliki kolom dengan rician sebagai berikut :</p>
+<ul>
+  <li>CustomerID : Kode Pelanggan dengan format campuran text <em>CUST-</em> diikuti anggka</li>
+  <li>Nama Pelanggan : Nama dari pelanggan dengan format text</li>
+  <li>Jenis Kelamin : Jenis Kelamin dari pelanggan. hanya terdapat dua isidata kategori yaitu Pria dan Wanita</li>
+  <li>Umur : Umur dari pelanggan dalam format angka</li>
+  <li>Profesi : Profesi dari pelanggan, bertipe text kategoru yang terdiri dari : Wiraswasta, Pelajar, Professional, Ibu Rumah Tangga, dan Mahasiswa.</li>
+  <li>Tipe Residen : Tipe tempat tinggal dari pelanggan, terdiri dari 2 kategori yaitu Cluster dan Sector.</li>
+  <li>NilaiBelanjaSetahun : merupakan total belanja yang sudah dikeluarka oleh pelanggan tersebut.</li>
+</ul>
+
+<h2 id="persiapkan-library">Persiapkan Library</h2>
+<ul>
+  <li>Pandas, di gunakan untuk melakukan pemrosesan analisis data</li>
+  <li>Matplotlib, di gunakan sebagai dasar untuk melakukan visualisasi data</li>
+  <li>Seaborn, di gunakan di atas matplotlib untuk melakukan data visualisasi yang lebih menarik</li>
+  <li>Scikit - Learn, digunakan untuk mempersiapkan data sebelum dilakukan permodelan</li>
+  <li>kmodes, digunakan untuk melakukan permodelan menggunakan algoritma K-Modes dan K-Prototypes.</li>
+  <li>Pickle, digunakan untuk melakukan penyimpanan dari model yang akan di buat</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>  
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>  
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>  
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+  
+<span class="kn">from</span> <span class="nn">kmodes.kmodes</span> <span class="kn">import</span> <span class="n">KModes</span>  
+<span class="kn">from</span> <span class="nn">kmodes.kprototypes</span> <span class="kn">import</span> <span class="n">KPrototypes</span>  
+<span class="kn">import</span> <span class="nn">pickle</span>  
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Baca Data Pelanggan
+# import dataset  
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"https://storage.googleapis.com/dqlab-dataset/customer_segments.txt"</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">"</span><span class="se">\t</span><span class="s">"</span><span class="p">)</span>  
+  
+<span class="c1"># menampilkan data  
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Customer_ID       Nama Pelanggan Jenis Kelamin  Umur       Profesi  \
+0    CUST-001         Budi Anggara          Pria    58    Wiraswasta   
+1    CUST-002     Shirley Ratuwati        Wanita    14       Pelajar   
+2    CUST-003         Agus Cahyono          Pria    48  Professional   
+3    CUST-004     Antonius Winarta          Pria    53  Professional   
+4    CUST-005  Ibu Sri Wahyuni, IR        Wanita    41    Wiraswasta   
+
+  Tipe Residen  NilaiBelanjaSetahun  
+0       Sector              9497927  
+1      Cluster              2722700  
+2      Cluster              5286429  
+3      Cluster              5204498  
+4      Cluster             10615206  
+</code></pre></div></div>
+
+<h2 id="melihat-informasi-dari-data">Melihat informasi dari Data</h2>
+<p>Lihat informasi jumlah kolom, nama kolom, indentifikasi null values dan tipe data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 50 entries, 0 to 49
+Data columns (total 7 columns):
+ #   Column               Non-Null Count  Dtype 
+---  ------               --------------  ----- 
+ 0   Customer_ID          50 non-null     object
+ 1   Nama Pelanggan       50 non-null     object
+ 2   Jenis Kelamin        50 non-null     object
+ 3   Umur                 50 non-null     int64 
+ 4   Profesi              50 non-null     object
+ 5   Tipe Residen         50 non-null     object
+ 6   NilaiBelanjaSetahun  50 non-null     int64 
+dtypes: int64(2), object(5)
+memory usage: 2.9+ KB
+</code></pre></div></div>
+
+<h2 id="kesimpulan">Kesimpulan</h2>
+<p>Dalam setiap project <em>machine learning</em> kita harus memahami informasi dasar dari data yang kita miliki sebelum melakukan analisa lebih lanjut, memastikan tipe data dari masing-masing kolom sudah benar, mengetahui apakah ada data null di tiap-tiap kolom, dan juga mengetahui nama-nama kolom di dataset yang digunakan. dari perintah diatas dapat diketahui bahwa :</p>
+<ul>
+  <li>Data yang akan digunakan terdir dari 50 baris dan 7 kolom.</li>
+  <li>Tidak ada nilai Null pada data</li>
+  <li>Dua kolom memiliki tipe data numeric dan lima data bertipe string</li>
+</ul>
+
+<p>Lanjut ke <a href="/data%20science/2021/07/19/customer-segmentation-with-python-part2">Explorasi Data</a></p>

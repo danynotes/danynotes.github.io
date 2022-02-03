@@ -1,0 +1,206 @@
+<p>Setelah mendapatkan data produk kategori dari <em>marketplace</em> shopee, yang telah saya tulis di <a href="/scraping/2021/08/17/scraping-shopee-category-product">Scraping kategori produk shopee</a>. Selanjutnya di notes berikut mengenai bagaimana scraping produk per kategori.</p>
+
+<h2 id="mencari-api-url-produk-per-kategori">Mencari API URL produk per kategori</h2>
+
+<ol>
+  <li>Buka shopee.co.id dengan browser, kemudian pilih salah satu kategory. setelah itu tekan ctrl + shift + i untuk membuka tool inspect.</li>
+  <li>Klik tab network, urutkan kolum tipe di tabel hasil pencarian, cari baris yang memiliki tipe <em>fetch</em>. Kemudian cari API URL di kolom name yang mengembalikan data produk per kategori.</li>
+</ol>
+
+<p><img src="https://lh3.googleusercontent.com/-hPoDB2pt5GY/YT76caclhcI/AAAAAAAAWXw/R6LtKXti3socXWFMBHUB53G_2lMb_BAQQCLcBGAsYHQ/image.png" alt="Inspect shopee produk item per kategori" /></p>
+
+<p>Dari gambar diatas sudah didapatkan URL API untuk mendapatkan produk per kategori, guna melihat lebih jelas format JSON datanya, saya menggunakan postman.</p>
+
+<p><img src="https://lh3.googleusercontent.com/-RJc0xk4V3cI/YT8B5aOi4ZI/AAAAAAAAWX4/QmnCNDsnk7wi8IehoAWwXATRfR8svXNewCLcBGAsYHQ/image.png" alt="postman produk per kategori" /></p>
+
+<h2 id="memproses-api-url-untuk-mendapatkan-produk-per-kategori">Memproses API URL untuk mendapatkan produk per kategori</h2>
+
+<ol>
+  <li>
+    <p><em>Requirement</em> dan <em>environment</em> yang yang digunakan untuk melakukan scraping produk shopee sama seperti yang digunakan di note sebelumnya <a href="/scraping/2021/08/17/scraping-shopee-category-product">Scraping kategori produk shopee</a>.</p>
+  </li>
+  <li>
+    <p>Buat kelas untuk mendapatkan produk per kategori.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    
+ <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Template</span>
+ <span class="kn">import</span> <span class="nn">requests</span>
+ <span class="kn">from</span> <span class="nn">db_connect</span> <span class="kn">import</span> <span class="n">Db_Connect</span>
+ <span class="kn">import</span> <span class="nn">json</span>
+ <span class="kn">from</span> <span class="nn">tools</span> <span class="kn">import</span> <span class="o">*</span>
+ <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Template</span>
+ <span class="kn">import</span> <span class="nn">click</span>
+ <span class="kn">import</span> <span class="nn">os</span>
+ <span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">def</span> <span class="nf">CollectProductByCategory</span><span class="p">():</span>
+
+     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_catid</span><span class="p">):</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">_catid</span> <span class="o">=</span> <span class="n">_catid</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="s">"https://shopee.co.id/api/v4/search/search_items?by=relevancy&amp;limit=100"</span>
+         <span class="s">"&amp;match_id={}&amp;newest=0&amp;order=desc&amp;page_type=search&amp;scenario=PAGE_OTHERS&amp;version=2"</span><span class="p">).</span><span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_catid</span><span class="p">)</span>
+          
+
+         <span class="bp">self</span><span class="p">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">Db_Connect</span><span class="p">(</span><span class="n">limit_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">reconnect</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">cursor</span>  <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">_cursor</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">SaveToDatabase</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">CollectProductCategory</span><span class="p">())</span>
+</code></pre></div>    </div>
+
+    <p>Di dalam init ini saya mendefinisikan URL API, database connection dan cursor serta melakukan eksekusi penyimpanan data produk ke dalam database. Kemudian buat fungsi <em>CollectProductCategory</em> untuk mengambil data produk per kategori dari website shopee, didalam fungsi ini saya memiliih untuk mendifinisikan field_name yang akan diambil ke dalam parameter list_rec, dan tidak memilih mengambil field_name secara dinamis dari apa yang dihasilkan <em>requets</em> untuk menghindari ketidak sesuaian penamaan field_name yang telah dibuat di dalam database.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+     <span class="k">def</span> <span class="nf">CollectProductCategory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="n">UA</span> <span class="o">=</span> <span class="p">(</span><span class="s">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"</span>
+             <span class="s">"Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.73"</span><span class="p">)</span>
+
+         <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s">"User-Agent"</span><span class="p">:</span> <span class="n">UA</span><span class="p">}</span>
+         <span class="n">test_request</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">url</span><span class="p">)</span>
+         <span class="k">if</span> <span class="n">test_request</span><span class="p">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+             <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">).</span><span class="n">content</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">"utf-8"</span><span class="p">)</span>
+             <span class="n">_source</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">resp</span><span class="p">)[</span><span class="s">'items'</span><span class="p">]</span>
+             <span class="n">list_rec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+       
+             <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">_source</span><span class="p">:</span>
+               
+                 <span class="n">items</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'item_basic'</span><span class="p">]</span>
+
+
+                 <span class="c1"># change null value to 0
+</span>                 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">items</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+                     <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s">'null'</span><span class="p">:</span>
+                         <span class="n">items</span><span class="p">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+
+                     <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s">"None"</span><span class="p">:</span>
+                         <span class="n">items</span><span class="p">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="bp">None</span><span class="p">})</span>
+                
+                     <span class="c1"># None for jsonb data type
+</span>                     <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s">'label_ids'</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+                         <span class="n">items</span><span class="p">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">None</span><span class="p">)})</span>
+
+                     <span class="c1"># change categoryid value using _catid's search parameter, because data got from scrap not related to master category
+</span>                     <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s">'catid'</span><span class="p">:</span>
+                         <span class="n">items</span><span class="p">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">_catid</span><span class="p">})</span>
+            
+                 <span class="c1"># create list record
+</span>                 <span class="n">list_rec</span> <span class="o">+=</span> <span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'itemid'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'shopid'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'name'</span><span class="p">]),</span> \
+                     <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'label_ids'</span><span class="p">]),</span> <span class="n">items</span><span class="p">[</span><span class="s">'image'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'images'</span><span class="p">]),</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'currency'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'stock'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'status'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'ctime'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'sold'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'historical_sold'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'liked'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'liked_count'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'view_count'</span><span class="p">]),</span> \
+                     <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'catid'</span><span class="p">]),</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'brand'</span><span class="p">]),</span> <span class="n">items</span><span class="p">[</span><span class="s">'cmt_count'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'flag'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'cb_option'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'item_status'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'price'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'price_min'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'price_max'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'price_min_before_discount'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'price_max_before_discount'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'hidden_price_display'</span><span class="p">]),</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'price_before_discount'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'has_lowest_price_guarantee'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'show_discount'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'raw_discount'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'discount'</span><span class="p">]),</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'is_category_failed'</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'size_chart'</span><span class="p">]),</span>\
+                     <span class="n">TextSanitize</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'item_rating'</span><span class="p">])),</span> <span class="n">items</span><span class="p">[</span><span class="s">'item_type'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'reference_item_id'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'transparent_background_image'</span><span class="p">],</span> 
+                     <span class="n">items</span><span class="p">[</span><span class="s">'is_adult'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'badge_icon_type'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'shopee_verified'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'is_official_shop'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'show_official_shop_label'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'show_shopee_verified_label'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'show_official_shop_label_in_title'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'is_cc_installment_payment_eligible'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'is_non_cc_installment_payment_eligible'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'coin_earn_label'</span><span class="p">]),</span> <span class="n">items</span><span class="p">[</span><span class="s">'show_free_shipping'</span><span class="p">],</span> \
+                     <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'preview_info'</span><span class="p">]),</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'coin_info'</span><span class="p">]),</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'exclusive_price_info'</span><span class="p">]),</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'bundle_deal_id'</span><span class="p">]),</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'can_use_bundle_deal'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'bundle_deal_info'</span><span class="p">]),</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'is_group_buy_item'</span><span class="p">]),</span> \
+                     <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'has_group_buy_stock'</span><span class="p">]),</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'group_buy_info'</span><span class="p">]),</span> <span class="n">items</span><span class="p">[</span><span class="s">'welcome_package_type'</span><span class="p">],</span> \
+                     <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'welcome_package_info'</span><span class="p">]),</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'add_on_deal_info'</span><span class="p">]),</span> <span class="n">items</span><span class="p">[</span><span class="s">'can_use_wholesale'</span><span class="p">],</span> \
+                     <span class="n">items</span><span class="p">[</span><span class="s">'is_preferred_plus_seller'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'shop_location'</span><span class="p">]),</span> <span class="n">items</span><span class="p">[</span><span class="s">'has_model_with_available_shopee_stock'</span><span class="p">],</span> \
+                     <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'voucher_info'</span><span class="p">]),</span> <span class="n">items</span><span class="p">[</span><span class="s">'can_use_cod'</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s">'is_on_flash_sale'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'spl_installment_tenure'</span><span class="p">]),</span> \
+                     <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'is_live_streaming_price'</span><span class="p">]),</span> <span class="n">items</span><span class="p">[</span><span class="s">'is_mart'</span><span class="p">],</span> <span class="n">TextSanitize</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="s">'pack_size'</span><span class="p">])),</span>
+          
+             <span class="k">return</span> <span class="n">list_rec</span>
+         <span class="k">else</span><span class="p">:</span>
+             <span class="n">click</span><span class="p">.</span><span class="n">echo</span><span class="p">(</span><span class="s">'Error server respon {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">test_request</span><span class="p">.</span><span class="n">status_code</span><span class="p">))</span>
+             <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        
+</code></pre></div>    </div>
+
+    <p>Setelah itu saya buat fungsi untuk mengirim data hasil baca URL API ke dalam database postgreSQL.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        
+     <span class="k">def</span> <span class="nf">SaveToDatabase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+         <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">"itemid"</span><span class="p">,</span> <span class="s">"shopid"</span><span class="p">,</span> <span class="s">"name"</span><span class="p">,</span> <span class="s">"label_ids"</span><span class="p">,</span> <span class="s">"image"</span><span class="p">,</span>  <span class="s">"images"</span><span class="p">,</span> <span class="s">"currency"</span><span class="p">,</span> <span class="s">"stock"</span><span class="p">,</span> <span class="s">"status"</span><span class="p">,</span> <span class="s">"ctime"</span><span class="p">,</span> <span class="s">"sold"</span><span class="p">,</span> <span class="s">"historical_sold"</span><span class="p">,</span> 
+             <span class="s">"liked"</span><span class="p">,</span> <span class="s">"liked_count"</span><span class="p">,</span> <span class="s">"view_count"</span><span class="p">,</span> <span class="s">"catid"</span><span class="p">,</span> <span class="s">"brand"</span><span class="p">,</span> <span class="s">"cmt_count"</span><span class="p">,</span> <span class="s">"flag"</span><span class="p">,</span> <span class="s">"cb_option"</span><span class="p">,</span> <span class="s">"item_status"</span><span class="p">,</span> <span class="s">"price"</span><span class="p">,</span> <span class="s">"price_min"</span><span class="p">,</span>
+             <span class="s">"price_max"</span><span class="p">,</span> <span class="s">"price_min_before_discount"</span><span class="p">,</span> <span class="s">"price_max_before_discount"</span><span class="p">,</span> <span class="s">"hidden_price_display"</span><span class="p">,</span> <span class="s">"price_before_discount"</span><span class="p">,</span>
+             <span class="s">"has_lowest_price_guarantee"</span><span class="p">,</span> <span class="s">"show_discount"</span><span class="p">,</span> <span class="s">"raw_discount"</span><span class="p">,</span> <span class="s">"discount"</span><span class="p">,</span> <span class="s">"is_category_failed"</span><span class="p">,</span> <span class="s">"size_chart"</span><span class="p">,</span>
+             <span class="s">"item_rating"</span><span class="p">,</span> <span class="s">"item_type"</span><span class="p">,</span> <span class="s">"reference_item_id"</span><span class="p">,</span> <span class="s">"transparent_background_image"</span><span class="p">,</span>
+             <span class="s">"is_adult"</span><span class="p">,</span> <span class="s">"badge_icon_type"</span><span class="p">,</span> <span class="s">"shopee_verified"</span><span class="p">,</span> <span class="s">"is_official_shop"</span><span class="p">,</span> <span class="s">"show_official_shop_label"</span><span class="p">,</span> <span class="s">"show_shopee_verified_label"</span><span class="p">,</span>
+             <span class="s">"show_official_shop_label_in_title"</span><span class="p">,</span> <span class="s">"is_cc_installment_payment_eligible"</span><span class="p">,</span> <span class="s">"is_non_cc_installment_payment_eligible"</span><span class="p">,</span> <span class="s">"coin_earn_label"</span><span class="p">,</span>
+             <span class="s">"show_free_shipping"</span><span class="p">,</span> <span class="s">"preview_info"</span><span class="p">,</span> <span class="s">"coin_info"</span><span class="p">,</span>  <span class="s">"exclusive_price_info"</span><span class="p">,</span>  <span class="s">"bundle_deal_id"</span><span class="p">,</span>  <span class="s">"can_use_bundle_deal"</span><span class="p">,</span> <span class="s">"bundle_deal_info"</span><span class="p">,</span>
+             <span class="s">"is_group_buy_item"</span><span class="p">,</span> <span class="s">"has_group_buy_stock"</span><span class="p">,</span> <span class="s">"group_buy_info"</span><span class="p">,</span> <span class="s">"welcome_package_type"</span><span class="p">,</span> <span class="s">"welcome_package_info"</span><span class="p">,</span> <span class="s">"add_on_deal_info"</span><span class="p">,</span> <span class="s">"can_use_wholesale"</span><span class="p">,</span>
+             <span class="s">"is_preferred_plus_seller"</span><span class="p">,</span> <span class="s">"shop_location"</span><span class="p">,</span> <span class="s">"has_model_with_available_shopee_stock"</span><span class="p">,</span> <span class="s">"voucher_info"</span><span class="p">,</span> <span class="s">"can_use_cod"</span><span class="p">,</span> <span class="s">"is_on_flash_sale"</span><span class="p">,</span> <span class="s">"spl_installment_tenure"</span><span class="p">,</span><span class="s">"is_live_streaming_price"</span><span class="p">,</span> <span class="s">"is_mart"</span><span class="p">,</span> <span class="s">"pack_size"</span><span class="p">]</span>
+        
+         <span class="n">col</span> <span class="o">=</span> <span class="s">''</span>
+         <span class="n">col_excluded</span> <span class="o">=</span> <span class="s">''</span>
+         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+         <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+             <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">):</span>
+                 <span class="n">col</span> <span class="o">+=</span> <span class="n">field_name</span> <span class="o">+</span> <span class="s">", "</span>
+                 <span class="n">col_excluded</span> <span class="o">+=</span> <span class="n">field_name</span> <span class="o">+</span> <span class="s">"=EXCLUDED."</span> <span class="o">+</span> <span class="n">field_name</span> <span class="o">+</span> <span class="s">", "</span>
+             <span class="k">else</span><span class="p">:</span>
+                 <span class="n">col</span> <span class="o">+=</span> <span class="n">field_name</span>
+                 <span class="n">col_excluded</span> <span class="o">+=</span> <span class="n">field_name</span> <span class="o">+</span> <span class="s">"=EXCLUDED."</span> <span class="o">+</span> <span class="n">field_name</span> 
+        
+         <span class="n">Template_SQL</span> <span class="o">=</span> <span class="p">(</span><span class="s">"INSERT INTO item($fields_raw) VALUES $list_values"</span>
+             <span class="s">" ON CONFLICT (itemid) DO UPDATE SET $fields_excluded;</span><span class="se">\n</span><span class="s">"</span>
+         <span class="p">)</span>
+
+         <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+
+             <span class="n">strSQL</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">Template_SQL</span><span class="p">).</span><span class="n">substitute</span><span class="p">(</span>
+                 <span class="n">fields_raw</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> 
+                 <span class="n">list_values</span><span class="o">=</span><span class="n">rec</span><span class="p">,</span>
+                 <span class="n">fields_excluded</span><span class="o">=</span><span class="n">col_excluded</span>
+             <span class="p">)</span>
+
+            
+             <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">strSQL</span><span class="p">)</span>
+             <span class="n">click</span><span class="p">.</span><span class="n">echo</span><span class="p">(</span><span class="s">'Saving data kode_produk: {0} - id_toko : {1} - nama_barang: {2}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rec</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+         <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Buat class untuk mengambil data item produk per kategori</p>
+
+    <p>Di dalam class ini dilakukan looping pengambilan data produk per kategori dari master katergori produk yang didapat dari proses scraping kategori produk shopee di note sebelumnya.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   
+ <span class="k">class</span> <span class="nc">CollectProductItems</span><span class="p">():</span>
+
+     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">Db_Connect</span><span class="p">(</span><span class="n">limit_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">reconnect</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">_cursor</span>
+
+         <span class="bp">self</span><span class="p">.</span><span class="n">GetItems</span><span class="p">()</span>
+
+     <span class="k">def</span> <span class="nf">GetItems</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="n">strSQL</span> <span class="o">=</span> <span class="p">(</span><span class="s">"select distinct(catid) from main_category mc "</span>
+                 <span class="s">" union "</span>
+                 <span class="s">"select distinct(catid) from sub_category sc "</span><span class="p">)</span>
+
+         <span class="bp">self</span><span class="p">.</span><span class="n">cursor</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">strSQL</span><span class="p">)</span>
+
+         <span class="n">_result</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">cursor</span><span class="p">.</span><span class="n">fetchall</span><span class="p">()</span>
+    
+         <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">_result</span><span class="p">:</span>
+             <span class="n">string_row</span> <span class="o">=</span> <span class="n">clearCatID</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+             <span class="n">CollectProductByCategory</span><span class="p">(</span><span class="n">string_row</span><span class="p">)</span>
+    
+         <span class="n">click</span><span class="p">.</span><span class="n">echo</span><span class="p">(</span><span class="s">'Scrap complete..!'</span><span class="p">)</span>
+         <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">()</span>
+         
+
+ <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+     <span class="n">CollectProductItems</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>Dan berikut capture hasil scraping data produk shopee per kategori.</p>
+
+<p><img src="https://lh3.googleusercontent.com/-ggv1gbXYS7c/YT9Wba4kIDI/AAAAAAAAWYA/AI4u8iIBEM0ch77ydx5G6hWpGt7O6PY_ACLcBGAsYHQ/image.png" alt="Data Scraping produk shopee per kategori" /></p>

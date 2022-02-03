@@ -1,0 +1,132 @@
+<p>Setelah melakukan <a href="/data%20science/2021/07/19/customer-segmentation-with-python-part2">explorasi data</a> selanjutnya di part ke-3 ini kita melakukan persiapan data sebelum membuat model.</p>
+
+<h2 id="mempersiapkan-data-sebelum-permodelan">Mempersiapkan Data sebelum permodelan</h2>
+
+<p>Setiap machine learning model memiliki karakteriktik yang berbeda-beda. Oleh karena itu harus mempersiapkan data yang dimiliki sebelum melakukan permodelan, sehingga dapat menyesuaikan dengan karakteristik yang dimiliki oleh tiap model dan mendapatkan hasil yang optimal.</p>
+
+<p>Disini teknik permodelan yang akan digunakan adalah unsupervised clustering. Algoritma yang digunakan adalah K-Prototypes. Langkah-langkahnya sebagai berikut :</p>
+<ul>
+  <li>Salah satu faktor utama dalam algoritma ini adalah perlu menggunakan data yang skala antar variable nya setara,</li>
+  <li>Selain itu juga perlu melakukan encoding kolom-kolom kategorikal yang dimiliki menjadi numerik,</li>
+  <li>kemudian menggabungkan hasil pemrosesan data tersebut menjadi satu data frame untuk digunakan dalam permodelan.</li>
+</ul>
+
+<h3 id="1lakukan-standarisasi-kolom-kolom-numerik-supaya-berada-pada-satu-skala-sehingga-variable-yang-memiliki-skala-besar-tidak-mendominsasi-bagaimana-cluster-akan-dibentuk-dan-juga-tiap-variabel-akan-dianggap-sama-pentingnya-oleh-algoritma">1.Lakukan standarisasi kolom-kolom numerik supaya berada pada satu skala sehingga variable yang memiliki skala besar tidak mendominsasi bagaimana cluster akan dibentuk dan juga tiap variabel akan dianggap sama pentingnya oleh algoritma</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>  
+  
+<span class="n">kolom_numerik</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Umur'</span><span class="p">,</span><span class="s">'NilaiBelanjaSetahun'</span><span class="p">]</span>  
+  
+<span class="c1"># Statistik sebelum Standardisasi  
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Statistik Sebelum Standardisasi</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>  
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">kolom_numerik</span><span class="p">].</span><span class="n">describe</span><span class="p">().</span><span class="nb">round</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>  
+  
+<span class="c1"># Standardisasi  
+</span><span class="n">df_std</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">().</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">kolom_numerik</span><span class="p">])</span>  
+  
+<span class="c1"># Membuat DataFrame  
+</span><span class="n">df_std</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df_std</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="p">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">kolom_numerik</span><span class="p">].</span><span class="n">columns</span><span class="p">)</span>  
+  
+<span class="c1"># Menampilkan contoh isi data dan summary statistic  
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Contoh hasil standardisasi</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>  
+<span class="k">print</span><span class="p">(</span><span class="n">df_std</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>  
+  
+<span class="k">print</span><span class="p">(</span><span class="s">'Statistik hasil standardisasi</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>  
+<span class="k">print</span><span class="p">(</span><span class="n">df_std</span><span class="p">.</span><span class="n">describe</span><span class="p">().</span><span class="nb">round</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>  
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Statistik Sebelum Standardisasi
+
+       Umur  NilaiBelanjaSetahun
+count  50.0                 50.0
+mean   37.5            7069874.8
+std    14.7            2590619.0
+min    14.0            2722700.0
+25%    25.0            5257529.8
+50%    35.0            5980077.0
+75%    49.8            9739615.0
+max    64.0           10884508.0
+Contoh hasil standardisasi
+
+       Umur  NilaiBelanjaSetahun
+0  1.411245             0.946763
+1 -1.617768            -1.695081
+2  0.722833            -0.695414
+3  1.067039            -0.727361
+4  0.240944             1.382421
+Statistik hasil standardisasi
+
+       Umur  NilaiBelanjaSetahun
+count  50.0                 50.0
+mean    0.0                 -0.0
+std     1.0                  1.0
+min    -2.0                 -2.0
+25%    -1.0                 -1.0
+50%    -0.0                 -0.0
+75%     1.0                  1.0
+max     2.0                  1.0
+</code></pre></div></div>
+
+<h3 id="2-konversi-kategorikal-data-dengan-label-encoder">2. Konversi Kategorikal Data dengan label encoder</h3>
+<p>Selanjutnya ubah kolom-kolom yang berjenis kategorikal menjadi angka. Gunakan fungsi LabelEncoder dari sklearn. Fungsi ini akan melakukan konversi data pelanggan dari teks menjadi numerik, contoh pada kolom Jenis Kelamin, tesk ‘Pria’ akan diubah menjadi angka 0 dan text ‘Wanita’ akan diubah menjadi 1.
+Perubahan ini perlu kita untuk semua teks semua sebelum digunakan pada algoritma K-Prototype.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+  
+<span class="c1"># Inisiasi nama kolom kategorikal  
+</span><span class="n">kolom_numerik</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Umur'</span><span class="p">,</span><span class="s">'Profesi'</span><span class="p">,</span><span class="s">'Tipe Residen'</span><span class="p">]</span>  
+  
+<span class="c1"># Membuat salinan data frame  
+</span><span class="n">df_encode</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">kolom_kategorikal</span><span class="p">].</span><span class="n">copy</span><span class="p">()</span>  
+  
+  
+<span class="c1"># Melakukan labelEncoder untuk semua kolom kategorikal  
+</span><span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">kolom_kategorikal</span><span class="p">:</span>  
+    <span class="n">df_encode</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">().</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_encode</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+      
+<span class="c1"># Menampilkan data  
+</span><span class="k">print</span><span class="p">(</span><span class="n">df_encode</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   Jenis Kelamin  Profesi  Tipe Residen
+0              0        4             1
+1              1        2             0
+2              0        3             0
+3              0        3             0
+4              1        4             0
+</code></pre></div></div>
+
+<h3 id="3-menggabungkan-data-untuk-permodelan">3. Menggabungkan Data untuk Permodelan</h3>
+<p>Tahap ini menggabungkan data frame dari kedua pemrosesan sebelumnya yaitu dt_std dan df_encode.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Menggabungkan data frame
+</span><span class="n">df_model</span><span class="o">=</span> <span class="n">df_encode</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_std</span><span class="p">,</span> <span class="n">left_index</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span> <span class="s">'left'</span><span class="p">)</span> 
+<span class="k">print</span><span class="p">(</span><span class="n">df_model</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   Jenis Kelamin  Profesi  Tipe Residen      Umur  NilaiBelanjaSetahun
+0              0        4             1  1.411245             0.946763
+1              1        2             0 -1.617768            -1.695081
+2              0        3             0  0.722833            -0.695414
+3              0        3             0  1.067039            -0.727361
+4              1        4             0  0.240944             1.382421
+</code></pre></div></div>
+
+<h2 id="kesimpulan">Kesimpulan</h2>
+<p>Sampai tahap ini sudah dilakukan beberapa langkah untuk pemrosesan data, sebagai berikut :</p>
+<ol>
+  <li>Menyiapkan library data</li>
+  <li>Melakukan proses eksplorasi data</li>
+  <li>Menyiapkan data untuk digunakan permodelan</li>
+</ol>
+
+<p>Pada penerapan di industri, proses pemrosesan data ini termasuk yang paling banyak menghabiskan waktu bagi data scientist. Selain yang sudah dilakukan diatas masih banyak teknik lain yang perlu dilakukan, misalnya :</p>
+<ul>
+  <li>Melakukan data imputation ketika ada <em>Null</em> data di data set yang akan digunakan</li>
+  <li>Melakukan transformasi variabel, ketika ditemukan distribusi data yang condong ke salah satu sisi (skew data)</li>
+  <li>Menangani pencilan data</li>
+</ul>
+
+<p>Lanjut ke <a href="/data%20science/2021/07/19/customer-segmentation-with-python-part4">pembuatan model</a>.</p>

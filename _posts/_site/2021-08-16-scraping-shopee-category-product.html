@@ -1,0 +1,341 @@
+<p>Data scraping help the process of collecting data to conduct market research or get sales leads, optimize prices and take information and understanding of consumer needs about competitors’ products and services from websites, blogs, forums or marketplaces.</p>
+
+<p>This notes is about the example of scraping in python to get product category data from https://shopee.co.id and save it in the Postgresql database.</p>
+
+<h2 id="looking-for-apis-that-provide-product-category-data">Looking for APIs that provide product category data</h2>
+
+<ol>
+  <li>
+    <p>Open Chrome and go to http://shopee.co.id</p>
+
+    <p>Click cursor on category and then press ctrl+shift+i to inspect page,  as shown in the following image.</p>
+
+    <p><img src="https://lh3.googleusercontent.com/-iG3w93UcCQI/YRvEmsL9F_I/AAAAAAAAWJo/PtgsU6sK-5UTy6NLZ6FRZJvgekFezi4xQCLcBGAsYHQ/image.png" alt="Inspect shopee.co.id page" /></p>
+
+    <p>Click on the Network menu tab, sort the column type in the table results and look for rows of type <em>fetch</em>. Then find the API URL in the Name column that provides the category data in the preview.</p>
+
+    <p><img src="https://lh3.googleusercontent.com/-VjA6JSLvnpA/YRvIP6K88VI/AAAAAAAAWJw/8pF_379s1RID21xwXf_QLUYsu1BQaYE3wCLcBGAsYHQ/image.png" alt="preview category data" /></p>
+
+    <p>After finding the required URL, click the Headers tab to view the URL address and copy it for further processing.</p>
+
+    <p><img src="https://lh3.googleusercontent.com/-Mr2uoMni-aY/YRvMRjWZp-I/AAAAAAAAWJ4/zApqp3gq7ZoVGFCgumY13TLthc9H-lCGACLcBGAsYHQ/image.png" alt="url category data" /></p>
+
+    <p>I use the postman application to provide an overview of the JSON data format generated from the URL.</p>
+
+    <p><img src="https://lh3.googleusercontent.com/-6YnRw3r9A-U/YRvNSvPmW9I/AAAAAAAAWKA/g2_lf2k9gjAr0jLgaKih44xZI8ghDMr3wCLcBGAsYHQ/image.png" alt="postman get category list" />.</p>
+  </li>
+</ol>
+
+<h2 id="collecting-data">Collecting data</h2>
+
+<ol>
+  <li>
+    <p>prepare requirement installation</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- install postgreSQL
+- install psycopg2
+- install requests
+- install python-dotenv
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Create an environment config class</p>
+
+    <p>This class will read and return environment (.env) file</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+ <span class="kn">import</span> <span class="nn">os</span>
+ <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">get_type_hints</span><span class="p">,</span> <span class="n">Union</span>
+
+ <span class="n">load_dotenv</span><span class="p">()</span>
+
+ <span class="k">class</span> <span class="nc">AppConfigError</span><span class="p">(</span><span class="nb">Exception</span><span class="p">):</span>
+     <span class="k">pass</span>
+
+ <span class="k">def</span> <span class="nf">_parse_bool</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pylint:      disable=E1136 
+</span>     <span class="k">return</span> <span class="n">val</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bool</span> <span class="k">else</span> <span class="n">val</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s">'true'</span><span class="p">,</span> <span class="s">'yes'</span><span class="p">,</span> <span class="s">'1'</span><span class="p">]</span>
+
+
+ <span class="k">class</span> <span class="nc">AppConfig</span><span class="p">:</span>
+     <span class="n">DEBUG</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">False</span>
+     <span class="n">ENV</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">'development'</span>
+     <span class="n">POSTGRES_DB</span><span class="p">:</span> <span class="nb">str</span>
+     <span class="n">POSTGRES_USER</span><span class="p">:</span> <span class="nb">str</span>
+     <span class="n">POSTGRES_PASSWORD</span><span class="p">:</span> <span class="nb">str</span>
+     <span class="n">POSTGRES_HOST</span><span class="p">:</span> <span class="nb">str</span>
+     <span class="n">POSTGRES_PORT</span><span class="p">:</span> <span class="nb">int</span>
+     <span class="n">LIMIT_RETRIES</span><span class="p">:</span> <span class="nb">int</span>
+
+ <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+     <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">__annotations__</span><span class="p">:</span>
+         <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="p">.</span><span class="n">isupper</span><span class="p">():</span>
+             <span class="k">continue</span>
+
+         <span class="c1"># Raise AppConfig Error if required field not supplied
+</span>         <span class="n">default_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+         <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">env</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+             <span class="k">raise</span> <span class="n">AppConfigError</span><span class="p">(</span><span class="s">'The {} field is required'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">field</span><span class="p">))</span>
+
+         <span class="c1"># Cast env var value to expected type and raise AppConfigError on failure
+</span>         <span class="k">try</span><span class="p">:</span>
+             <span class="n">var_type</span> <span class="o">=</span> <span class="n">get_type_hints</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">)[</span><span class="n">field</span><span class="p">]</span>
+             <span class="k">if</span> <span class="n">var_type</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+                 <span class="n">value</span> <span class="o">=</span> <span class="n">_parse_bool</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">default_value</span><span class="p">))</span>
+             <span class="k">else</span><span class="p">:</span>
+                 <span class="n">value</span> <span class="o">=</span> <span class="n">var_type</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">default_value</span><span class="p">))</span>
+
+             <span class="bp">self</span><span class="p">.</span><span class="n">__setattr__</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+         <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+             <span class="k">raise</span> <span class="n">AppConfigError</span><span class="p">(</span><span class="s">'Unable to cast value of "{}" to type "{}" for "{}" field'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+                 <span class="n">env</span><span class="p">[</span><span class="n">field</span><span class="p">],</span>
+                 <span class="n">var_type</span><span class="p">,</span>
+                 <span class="n">field</span>
+             <span class="p">)</span>
+         <span class="p">)</span>
+
+ <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+
+
+ <span class="c1"># Expose Config object for app to import
+</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">AppConfig</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Create Database connection class</p>
+
+    <p>This class used for database operation</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">import</span> <span class="nn">psycopg2</span>
+ <span class="kn">import</span> <span class="nn">time</span>
+ <span class="kn">from</span> <span class="nn">db_environ</span> <span class="kn">import</span> <span class="n">Config</span>
+
+
+ <span class="k">class</span> <span class="nc">Db_Connect</span><span class="p">():</span>
+
+     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit_retries</span><span class="p">,</span> <span class="n">reconnect</span><span class="p">):</span>
+        
+         <span class="bp">self</span><span class="p">.</span><span class="n">param_dict</span> <span class="o">=</span> <span class="p">{</span>
+             <span class="s">"host"</span>      <span class="p">:</span> <span class="n">Config</span><span class="p">.</span><span class="n">POSTGRES_HOST</span><span class="p">,</span>
+             <span class="s">"port"</span>      <span class="p">:</span> <span class="n">Config</span><span class="p">.</span><span class="n">POSTGRES_PORT</span><span class="p">,</span>
+             <span class="s">"database"</span>  <span class="p">:</span> <span class="n">Config</span><span class="p">.</span><span class="n">POSTGRES_DB</span><span class="p">,</span>
+             <span class="s">"user"</span>      <span class="p">:</span> <span class="n">Config</span><span class="p">.</span><span class="n">POSTGRES_USER</span><span class="p">,</span>
+             <span class="s">"password"</span>  <span class="p">:</span> <span class="n">Config</span><span class="p">.</span><span class="n">POSTGRES_PASSWORD</span>
+         <span class="p">}</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="bp">None</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span> <span class="o">=</span> <span class="bp">None</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">reconnect</span> <span class="o">=</span> <span class="n">reconnect</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">limit_retries</span> <span class="o">=</span> <span class="n">limit_retries</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">ignite</span><span class="p">()</span>
+    
+     <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">retry_counter</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span><span class="p">:</span>
+             <span class="k">try</span><span class="p">:</span>
+                 <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="p">.</span><span class="n">param_dict</span><span class="p">)</span>
+                 <span class="n">retry_counter</span> <span class="o">=</span> <span class="mi">0</span>
+                 <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span><span class="p">.</span><span class="n">autocommit</span> <span class="o">=</span> <span class="bp">False</span>
+                 <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span>
+             <span class="k">except</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">OperationalError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">reconnect</span> <span class="ow">or</span> <span class="n">retry_counter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="p">.</span> <span class="n">limit_retries</span><span class="p">:</span>
+                     <span class="k">raise</span> <span class="n">error</span>
+                 <span class="k">else</span><span class="p">:</span>
+                     <span class="n">retry_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                     <span class="k">print</span><span class="p">(</span><span class="s">"Got Error {}. reconnecting {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">).</span><span class="n">strip</span><span class="p">(),</span> <span class="n">retry_counter</span><span class="p">))</span>
+                     <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+                     <span class="bp">self</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">retry_counter</span><span class="p">)</span>
+             <span class="k">except</span> <span class="p">(</span><span class="nb">Exception</span><span class="p">,</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+             <span class="k">raise</span> <span class="n">error</span>
+
+     <span class="k">def</span> <span class="nf">pg_cursor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span> <span class="ow">or</span> <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span><span class="p">.</span><span class="n">closed</span><span class="p">:</span>
+             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span><span class="p">:</span>
+                 <span class="bp">self</span><span class="p">.</span><span class="n">connect</span><span class="p">()</span>
+             <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span><span class="p">.</span><span class="n">cursor</span><span class="p">()</span>
+             <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span>
+
+     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">str_query</span><span class="p">,</span> <span class="n">retry_counter</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+         <span class="k">try</span><span class="p">:</span>
+             <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">str_query</span><span class="p">)</span>
+             <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+             <span class="n">retry_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+         <span class="k">except</span> <span class="p">(</span><span class="n">psycopg2</span><span class="p">.</span><span class="n">DatabaseError</span><span class="p">,</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">OperationalError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+             <span class="k">if</span> <span class="n">retry_counter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="p">.</span><span class="n">limit_retries</span><span class="p">:</span>
+                 <span class="k">raise</span> <span class="n">error</span>
+             <span class="k">else</span><span class="p">:</span>
+                 <span class="n">retry_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                 <span class="k">print</span><span class="p">(</span><span class="s">"Got Error {}. reconnecting {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">).</span><span class="n">strip</span><span class="p">(),</span> <span class="n">retry_counter</span><span class="p">))</span>
+                 <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                 <span class="bp">self</span><span class="p">.</span><span class="n">reset</span><span class="p">()</span>
+                 <span class="bp">self</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">str_query</span><span class="p">,</span> <span class="n">retry_counter</span><span class="p">)</span>
+                 <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+        
+         <span class="k">except</span> <span class="p">(</span><span class="nb">Exception</span><span class="p">,</span> <span class="n">psycopg2</span><span class="p">.</span><span class="n">Error</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+             <span class="k">raise</span> <span class="n">error</span>
+            
+
+     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">connect</span><span class="p">()</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span><span class="p">()</span>
+
+     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span><span class="p">:</span>
+             <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span><span class="p">:</span>
+                 <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+                 <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+                 <span class="k">print</span><span class="p">(</span><span class="s">'Database connection is closed'</span><span class="p">)</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="bp">None</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">_cursor</span> <span class="o">=</span> <span class="bp">None</span> 
+
+     <span class="k">def</span> <span class="nf">ignite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">connect</span><span class="p">()</span>
+         <span class="bp">self</span><span class="p">.</span><span class="n">pg_cursor</span><span class="p">()</span>
+    
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Create class to collect category data</p>
+
+    <p>As we can see, in the general description of the JSON file, there are two types of data categories, namely main categories and subcategories. So I split the data collecting class for main and subcategories.</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+ <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">displayhook</span>
+ <span class="kn">import</span> <span class="nn">requests</span>
+ <span class="kn">from</span> <span class="nn">db_connect</span> <span class="kn">import</span> <span class="n">Db_Connect</span>
+ <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Template</span>
+
+
+ <span class="k">class</span> <span class="nc">CollectMainCategory</span><span class="p">():</span>
+
+ <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urlapi</span><span class="p">):</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">urlapi</span> <span class="o">=</span> <span class="n">urlapi</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">Db_Connect</span><span class="p">(</span><span class="n">limit_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">reconnect</span><span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">_cursor</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">SaveToDatabase</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">Collect_Main_Category</span><span class="p">())</span>
+
+ <span class="k">def</span> <span class="nf">Collect_Main_Category</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">urlapi</span>
+     <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">).</span><span class="n">json</span><span class="p">()</span>
+     <span class="n">category_source</span> <span class="o">=</span> <span class="n">resp</span><span class="p">[</span><span class="s">"data"</span><span class="p">]</span>
+     <span class="n">list_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">category_source</span><span class="p">:</span>
+         <span class="n">main_category</span> <span class="o">=</span> <span class="n">item</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"main"</span><span class="p">)</span>
+
+         <span class="n">list_values</span> <span class="o">+=</span> <span class="p">(</span><span class="n">main_category</span><span class="p">[</span><span class="s">'display_name'</span><span class="p">],</span> \
+                 <span class="n">main_category</span><span class="p">[</span><span class="s">'name'</span><span class="p">],</span> \
+                 <span class="n">main_category</span><span class="p">[</span><span class="s">'catid'</span><span class="p">],</span> \
+                 <span class="n">main_category</span><span class="p">[</span><span class="s">'parent_category'</span><span class="p">],</span> \
+                 <span class="nb">str</span><span class="p">(</span><span class="n">main_category</span><span class="p">[</span><span class="s">'is_adult'</span><span class="p">]),</span> \
+                 <span class="nb">str</span><span class="p">(</span><span class="n">main_category</span><span class="p">[</span><span class="s">'block_buyer_platform'</span><span class="p">]),</span> \
+                 <span class="n">main_category</span><span class="p">[</span><span class="s">'sort_weight'</span><span class="p">]),</span>
+
+     <span class="k">return</span> <span class="n">list_values</span>
+
+ <span class="k">def</span> <span class="nf">SaveToDatabase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+     <span class="n">Template_SQL</span> <span class="o">=</span> <span class="p">(</span><span class="s">"INSERT INTO main_category(display_name,name,catid,parent_category,is_adult,block_buyer_platform, sort_weight) "</span>
+                         <span class="s">"VALUES $list_value "</span>
+                         <span class="s">"ON CONFLICT (catid) "</span>
+                         <span class="s">"DO UPDATE SET display_name=EXCLUDED.display_name, "</span>
+                         <span class="s">"name=EXCLUDED.name, parent_category=EXCLUDED.parent_category, "</span>
+                         <span class="s">"is_adult=EXCLUDED.is_adult, block_buyer_platform=EXCLUDED.block_buyer_platform, "</span>
+                         <span class="s">"sort_weight=EXCLUDED.sort_weight;"</span>
+         <span class="p">)</span>
+        
+     <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+         <span class="n">strSQL</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">Template_SQL</span><span class="p">).</span><span class="n">substitute</span><span class="p">(</span>
+             <span class="n">list_value</span><span class="o">=</span><span class="n">rec</span>
+         <span class="p">)</span>
+        
+         <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">strSQL</span><span class="p">)</span>
+            
+ <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+     <span class="n">CollectMainCategory</span><span class="p">(</span><span class="s">"https://shopee.co.id/api/v2/category_list/get_all"</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+ <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">displayhook</span>
+ <span class="kn">import</span> <span class="nn">requests</span>
+ <span class="kn">from</span> <span class="nn">db_connect</span> <span class="kn">import</span> <span class="n">Db_Connect</span>
+ <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Template</span>
+ <span class="kn">import</span> <span class="nn">re</span>
+
+
+ <span class="k">class</span> <span class="nc">CollectSubCategory</span><span class="p">():</span>
+
+ <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urlapi</span><span class="p">):</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">urlapi</span> <span class="o">=</span> <span class="n">urlapi</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">Db_Connect</span><span class="p">(</span><span class="n">limit_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">reconnect</span><span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">_cursor</span>
+     <span class="bp">self</span><span class="p">.</span><span class="n">SaveToDatabase</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">Collect_Sub_Category</span><span class="p">())</span>
+     <span class="c1">#self.Collect_Sub_Category()
+</span>
+ <span class="k">def</span> <span class="nf">Collect_Sub_Category</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">urlapi</span>
+     <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">).</span><span class="n">json</span><span class="p">()</span>
+     <span class="n">_source</span> <span class="o">=</span> <span class="n">resp</span><span class="p">[</span><span class="s">"data"</span><span class="p">]</span>
+
+     <span class="n">list_rec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+     <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">_source</span><span class="p">:</span>
+         <span class="n">sub_category</span> <span class="o">=</span> <span class="n">dt</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'sub'</span><span class="p">)</span>
+        
+         <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">sub_category</span><span class="p">:</span>
+             <span class="n">sub</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s">'sub_sub'</span><span class="p">])</span>
+             <span class="n">sub_formated</span> <span class="o">=</span> <span class="n">sub</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">"</span><span class="se">\'</span><span class="s">"</span><span class="p">,</span><span class="s">"</span><span class="se">\"</span><span class="s">"</span><span class="p">)</span>
+             <span class="n">sub_formated</span> <span class="o">=</span> <span class="n">sub_formated</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">"None"</span><span class="p">,</span><span class="s">"</span><span class="se">\"</span><span class="s">None</span><span class="se">\"</span><span class="s">"</span><span class="p">)</span>
+
+             <span class="n">list_rec</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">TextSanitize</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s">'display_name'</span><span class="p">])),</span> \
+                 <span class="bp">self</span><span class="p">.</span><span class="n">TextSanitize</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s">'name'</span><span class="p">])),</span> \
+                 <span class="n">rec</span><span class="p">[</span><span class="s">'catid'</span><span class="p">],</span> \
+                 <span class="n">rec</span><span class="p">[</span><span class="s">'parent_category'</span><span class="p">],</span> \
+                 <span class="nb">str</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s">'is_adult'</span><span class="p">]),</span> \
+                 <span class="nb">str</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s">'block_buyer_platform'</span><span class="p">]),</span> \
+                 <span class="n">rec</span><span class="p">[</span><span class="s">'sort_weight'</span><span class="p">],</span>
+                 <span class="n">sub_formated</span><span class="p">),</span>
+
+     <span class="k">return</span> <span class="n">list_rec</span>
+
+ <span class="k">def</span> <span class="nf">TextSanitize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+     <span class="s">"""Sanitizes a string so that it can be properly compiled in TeX.
+     Escapes the most common TeX special characters: ~^_#%${}
+     Removes backslashes.
+     """</span>
+     <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="s">'</span><span class="se">\\\\</span><span class="s">'</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+     <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s">'([_^$%&amp;#{}])'</span><span class="p">,</span> <span class="sa">r</span><span class="s">'\\\1'</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+     <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s">'\''</span><span class="p">,</span> <span class="sa">r</span><span class="s">'\\~{}'</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+     <span class="k">return</span> <span class="n">s</span>
+
+ <span class="k">def</span> <span class="nf">SaveToDatabase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+     <span class="n">Template_SQL</span> <span class="o">=</span> <span class="p">(</span><span class="s">"INSERT INTO sub_category(display_name,name,catid,parent_category,is_adult,block_buyer_platform, sort_weight, sub_sub) "</span>
+                         <span class="s">"VALUES $list_recs "</span>
+                         <span class="s">"ON CONFLICT (catid) "</span>
+                         <span class="s">"DO UPDATE SET display_name=EXCLUDED.display_name, "</span>
+                         <span class="s">"name=EXCLUDED.name, parent_category=EXCLUDED.parent_category, "</span>
+                         <span class="s">"is_adult=EXCLUDED.is_adult, block_buyer_platform=EXCLUDED.block_buyer_platform, "</span>
+                         <span class="s">"sort_weight=EXCLUDED.sort_weight, "</span>
+                         <span class="s">"sub_sub=EXCLUDED.sub_sub;"</span>
+        <span class="p">)</span>
+        
+     <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+         <span class="n">strSQL</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">Template_SQL</span><span class="p">).</span><span class="n">substitute</span><span class="p">(</span>
+            <span class="n">list_recs</span><span class="o">=</span><span class="n">rec</span>
+         <span class="p">)</span>
+            
+         <span class="bp">self</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">strSQL</span><span class="p">)</span>
+          
+
+ <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+     <span class="n">CollectSubCategory</span><span class="p">(</span><span class="s">"https://shopee.co.id/api/v2/category_list/get_all"</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Scraping Result</p>
+
+    <p>Here is the result of scraping product category from shopee.co.id. These results can be used for further processing later</p>
+
+    <p><img src="https://lh3.googleusercontent.com/-tVqOF09xvmM/YRy-4RwnGjI/AAAAAAAAWKM/k6diGo_zUAA1-Erue1so5iqbFRFdmLfcwCLcBGAsYHQ/image.png" alt="scraping result" /></p>
+  </li>
+</ol>

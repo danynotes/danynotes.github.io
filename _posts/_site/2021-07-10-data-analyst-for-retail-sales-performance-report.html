@@ -1,0 +1,119 @@
+<h1 id="data-analyst-project---sales-performance-report">Data Analyst Project - Sales Performance Report</h1>
+
+<p>Project ini salah satu chapter didalam project DQLab yang di buat oleh Nelda Ampulembang Parenta - Senior Data Analyst (Logisly). project ini bertujuan untuk melakukan analisis terhadap performance dari DQLab Store dengan menggunakan MySQL.</p>
+
+<h2 id="dataset-brief">Dataset Brief</h2>
+
+<p>Dataset yang digunakan berisi transaksi dari tahun 2009 - 2012 dengan jumlah raw 5500, termasuk didalamnya order status yang terbagi menjadi <strong>order finished</strong>, <strong>order returned</strong> dan <strong>order cancelled</strong></p>
+
+<p>Dataset terdiri dari :</p>
+<ol>
+  <li>OrderID</li>
+  <li>Order Status</li>
+  <li>Customer</li>
+  <li>Order Date</li>
+  <li>Order Quantity</li>
+  <li>Sales</li>
+  <li>Discount %</li>
+  <li>Discount</li>
+  <li>Product Category</li>
+  <li>Product Sub-Category</li>
+</ol>
+
+<p>Dari pihak manajemen DQLab store ingin mengetahui:</p>
+
+<p>1A. Overall perofrmance DQLab Store dari tahun 2009 - 2012 untuk jumlah order dan total sales order finished<br />
+1B. Overall performance DQLab by subcategory product yang akan dibandingkan antara tahun 2011 dan tahun 2012</p>
+
+<p>2A. Efektifitas dan efisiensi promosi yang dilakukan selama ini, dengan menghitung burn rate dari promosi yang dilakukan overall berdasarkan tahun<br />
+2B. Efektifitas dan efisiensi promosi yang dilakukan selama ini, dengan menghitung burn rate dari promosi yang dilakukan overall berdasarkan sub-category</p>
+
+<p>Setelah melihat hasil analisa di Sub Bab 1 dan 2, selanjutnya dilakukan analisa terhadap customer DQLab. Analisa dari sisi customer dengan menggunakan metrics:</p>
+
+<p>3A. Analisa terhadap customer setiap tahunnya<br />
+3B. Analisa terhadap jumlah customer baru setiap tahunnya<br />
+3C. Cohort untuk mengetahui angka retention customer tahun 2009</p>
+
+<h3 id="1a-overall-performance-by-year">1A. Overall Performance by Year</h3>
+<h3 id="buatlah-query-dengan-menggunakan-sql-untuk-mendapatkan-total-penjualan-sales-dan-jumlah-order-number_of_order-dari-tahun-2009---2012-years">Buatlah query dengan menggunakan SQL untuk mendapatkan total penjualan (sales) dan jumlah order (number_of_order) dari tahun 2009 - 2012 (years)</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT
+    YEAR(order_date) AS years,
+    SUM(sales) AS sales,
+    COUNT(order_id) AS number_of_order
+FROM
+    dqlab_sales_store
+WHERE
+    order_status = 'Order Finished'
+GROUP BY
+    years;
+</code></pre></div></div>
+<h3 id="1b-overall-performance-by-product-sub-category">1B. Overall Performance by product sub Category</h3>
+<h3 id="buatlah-query-dengan-menggunakan-sql-untuk-mendapatkan-total-penjualan-sales-berdasarkan-sub-category-dari-produk-product_sub_category-pada-tahun-2011-dan-2012-saja-years">Buatlah query dengan menggunakan SQL untuk mendapatkan total penjualan (sales) berdasarkan sub category dari produk (product_sub_category) pada tahun 2011 dan 2012 saja (years)</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT YEAR(order_date) AS years, 
+	product_sub_category, 
+	SUM(sales) AS sales
+FROM dqlab_sales_store
+WHERE 
+	order_status = "order finished" 
+	AND YEAR(order_date) IN("2011","2012")
+GROUP BY years, product_sub_category
+ORDER BY years,SUM(sales) DESC
+
+</code></pre></div></div>
+
+<h3 id="2a-promotion-effectiveness-and-efficiency-by-years">2A. Promotion Effectiveness and Efficiency by Years</h3>
+<h3 id="efektifitas-dan-efisiensi-dari-promosi-yang-dilakukan-akan-dianalisa-berdasarkan-burn-rate-yaitu-dengan-mebandingkan-total-value-promosi-yang-dikeluarkan-terhadap-total-sales-yang-diperoleh-dqlab-berharap-burn-rate-berada-diangka-maksimum-45">Efektifitas dan efisiensi dari promosi yang dilakukan akan dianalisa berdasarkan <em>Burn Rate</em> yaitu dengan mebandingkan total value promosi yang dikeluarkan terhadap total sales yang diperoleh. DQLab berharap <em>Burn Rate</em> berada diangka maksimum 4.5%.</h3>
+
+<p><strong><em>Burn Rate Formula : (total discount / total sales) * 100</em></strong></p>
+
+<p>Buatkan <em>Derived Tables</em> untuk menghitung total sales(sales) dan total discount (promotion_value) berdasarkan tahun(years) dan formulasikan persentase burn rate nya (burn_rate_percentage).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT YEAR(order_date) as years, 
+    SUM(sales) as sales,
+    SUM(discount_value) as promotion_value,
+    ROUND(SUM(discount_value) / SUM(sales) * 100, 2) as burn_rate_percentage
+FROM dqlab_sales_store
+WHERE
+	order_status LIKE 'Order Finished'
+GROUP BY
+    years
+ORDER BY
+    years;
+
+</code></pre></div></div>
+
+<h3 id="2b-promotion-effectiveness-and-efficiency-by-product-sub-category">2B. Promotion Effectiveness and Efficiency by Product Sub Category</h3>
+<h3 id="analisa-terhadap-efektifitas-dan-efisiensi-dari-promosi-yang-sudah-dilakukan-selama-ini-lakukan-query-yang-sama-seperti-2a-dengan-menambahkan-kolom-product_sub_category-dan-product_category">Analisa terhadap efektifitas dan efisiensi dari promosi yang sudah dilakukan selama ini. Lakukan query yang sama seperti 2A dengan menambahkan kolom product_sub_category dan product_category</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT YEAR(order_date) as years, 
+    product_sub_category,
+    product_category,
+    SUM(sales) as sales,
+    SUM(discount_value) as promotion_value,
+    ROUND(SUM(discount_value) / SUM(sales) * 100, 2) as burn_rate_percentage
+FROM dqlab_sales_store
+WHERE
+	order_status LIKE 'Order Finished' 
+    AND YEAR(order_date) = '2012'
+GROUP BY
+    years,
+    product_sub_category,
+    product_category
+ORDER BY
+    sales DESC;
+</code></pre></div></div>
+
+<h3 id="3a-customers-transactions-per-year">3A. Customers Transactions per Year</h3>
+<h3 id="dqlab-store-ini-mengetahui-jumlah-customer-number_of_customer-yang-bertransaksi-setiap-tahun-dari-2009-sampai-2012-years">DQLab Store ini mengetahui jumlah customer (number_of_customer) yang bertransaksi setiap tahun dari 2009 sampai 2012 (years).</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT YEAR(order_date) as years,
+	COUNT(DISTINCT(customer)) as number_of_customer
+FROM dqlab_sales_store
+WHERE YEAR(order_date) BETWEEN '2009' AND '2012'
+	AND order_status LIKE 'Order Finished'
+GROUP BY years	
+ORDER BY years;
+
+</code></pre></div></div>

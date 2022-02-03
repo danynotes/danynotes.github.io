@@ -1,0 +1,215 @@
+<h1 id="about-this-challenge">About this Challenge</h1>
+
+<p>Challenge SQL yang dibuat oleh <a href="https://www.phi-integration.com/">xeratic</a> ini merupakan challenge pertama di dalam chapter projects DQLab Course yang bertujuan untuk menguji tingkat pemahaman SQL.</p>
+
+<h2 id="tabel-data-yang-tersedia">Tabel data yang tersedia</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">ms_pelanggan</th>
+      <th style="text-align: center"> </th>
+      <th style="text-align: center"> </th>
+      <th style="text-align: center"> </th>
+      <th style="text-align: center">ms_produk</th>
+      <th style="text-align: center"> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Field</td>
+      <td style="text-align: center">Type</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center">Field</td>
+      <td style="text-align: center">Type</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">no_urut</td>
+      <td style="text-align: center">Integer</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center">no_urut</td>
+      <td style="text-align: center">Integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">kode_pelanggan</td>
+      <td style="text-align: center">Varchar</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center">kode_produk</td>
+      <td style="text-align: center">Varchar</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">nama_pelanggan</td>
+      <td style="text-align: center">Varchar</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center">nama_produk</td>
+      <td style="text-align: center">Varchar</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">alamat</td>
+      <td style="text-align: center">Varchar</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center">harga</td>
+      <td style="text-align: center">Double</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">tr_penjualan</th>
+      <th style="text-align: center"> </th>
+      <th style="text-align: center"> </th>
+      <th style="text-align: center"> </th>
+      <th> </th>
+      <th style="text-align: center">tr_penjualan_detail</th>
+      <th style="text-align: center"> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Field</td>
+      <td style="text-align: center">Type</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td> </td>
+      <td style="text-align: center">Field</td>
+      <td style="text-align: center">Type</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">kode_transaksi</td>
+      <td style="text-align: center">Varchar</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td> </td>
+      <td style="text-align: center">kode_transaksi</td>
+      <td style="text-align: center">Varchar</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">kode_pelanggan</td>
+      <td style="text-align: center">Varchar</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td> </td>
+      <td style="text-align: center">kode_produk</td>
+      <td style="text-align: center">Varchar</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">tanggal_transaksi</td>
+      <td style="text-align: center">Date</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td> </td>
+      <td style="text-align: center">qty</td>
+      <td style="text-align: center">Integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+      <td> </td>
+      <td style="text-align: center">harga_satuan</td>
+      <td style="text-align: center">Double</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="1-tampilkan-daftar-produk-yang-memiliki-harga-antara-50000-and-150000nama-kolom-yang-harus-ditampilkan-no_urut-kode_produk-nama_produk-dan-harga">1. tampilkan daftar produk yang memiliki harga antara 50.000 and 150.000.Nama kolom yang harus ditampilkan: no_urut, kode_produk, nama_produk, dan harga</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT no_urut, kode_produk, nama_produk, harga 
+FROM ms_produk
+WHERE harga &gt;= 50000 and harga &lt;= 150000;
+</code></pre></div></div>
+<h3 id="2-tampilkan-semua-produk-yang-mengandung-kata-flashdisk-nama-kolom-yang-harus-ditampilkan-no_urut-kode_produk-nama_produk-dan-harga">2. Tampilkan semua produk yang mengandung kata Flashdisk. Nama kolom yang harus ditampilkan: no_urut, kode_produk, nama_produk, dan harga.</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT no_urut, kode_produk, nama_produk, harga 
+FROM ms_produk 
+WHERE nama_produk LIKE '%Flashdisk%';
+</code></pre></div></div>
+<h3 id="3-tampilkan-hanya-nama-nama-pelanggan-yang-hanya-memiliki-gelar-gelar-berikut-sh-ir-dan-drs-nama-kolom-yang-harus-ditampilkan-no_urut-kode_pelanggan-nama_pelanggan-dan-alamat">3. Tampilkan hanya nama-nama pelanggan yang hanya memiliki gelar-gelar berikut: S.H, Ir. dan Drs. Nama kolom yang harus ditampilkan: no_urut, kode_pelanggan, nama_pelanggan, dan alamat.</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT no_urut, kode_pelanggan, nama_pelanggan, alamat 
+FROM ms_pelanggan 
+WHERE nama_pelanggan 
+LIKE '%S.H.%' OR nama_pelanggan LIKE '%Ir.%' OR nama_pelanggan LIKE '%Drs.%';
+</code></pre></div></div>
+<h3 id="4-tampilkan-nama-nama-pelanggan-dan-urutkan-hasilnya-berdasarkan-kolom-nama_pelanggan-dari-yang-terkecil-ke-yang-terbesar-a-ke-z-nama-kolom-yang-harus-ditampilkan-nama_pelanggan">4. Tampilkan nama-nama pelanggan dan urutkan hasilnya berdasarkan kolom nama_pelanggan dari yang terkecil ke yang terbesar (A ke Z). Nama kolom yang harus ditampilkan: nama_pelanggan.</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT nama_pelanggan 
+FROM ms_pelanggan 
+ORDER by nama_pelanggan;
+</code></pre></div></div>
+<h3 id="5-tampilkan-nama-nama-pelanggan-dan-urutkan-hasilnya-berdasarkan-kolom-nama_pelanggan-dari-yang-terkecil-ke-yang-terbesar-a-ke-z-namun-gelar-tidak-boleh-menjadi-bagian-dari-urutan-contoh-ir-agus-nugraha-harus-berada-di-atas-heidi-goh-nama-kolom-yang-harus-ditampilkan-nama_pelanggan">5. Tampilkan nama-nama pelanggan dan urutkan hasilnya berdasarkan kolom nama_pelanggan dari yang terkecil ke yang terbesar (A ke Z), namun gelar tidak boleh menjadi bagian dari urutan. Contoh: Ir. Agus Nugraha harus berada di atas Heidi Goh. Nama kolom yang harus ditampilkan: nama_pelanggan.</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT nama_pelanggan 
+FROM ms_pelanggan 
+ORDER BY SUBSTRING_INDEX(nama_pelanggan, ". ", -1);
+</code></pre></div></div>
+<h3 id="6-tampilkan-nama-pelanggan-yang-memiliki-nama-paling-panjang-jika-ada-lebih-dari-1-orang-yang-memiliki-panjang-nama-yang-sama-tampilkan-semuanyanama-kolom-yang-harus-ditampilkan-nama_pelanggan">6. Tampilkan nama pelanggan yang memiliki nama paling panjang. Jika ada lebih dari 1 orang yang memiliki panjang nama yang sama, tampilkan semuanya.Nama kolom yang harus ditampilkan: nama_pelanggan</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT nama_pelanggan 
+FROM ms_pelanggan 
+WHERE LENGTH(nama_pelanggan) = (
+    SELECT max(LENGTH(nama_pelanggan)) FROM ms_pelanggan
+    );
+</code></pre></div></div>
+<h3 id="7-tampilkan-nama-orang-yang-memiliki-nama-paling-panjang-pada-row-atas-dan-nama-orang-paling-pendek-pada-row-setelahnya-gelar-menjadi-bagian-dari-nama-jika-ada-lebih-dari-satu-nama-yang-paling-panjang-atau-paling-pendek-harus-ditampilkan-semuanya-nama-kolom-yang-harus-ditampilkan-nama_pelanggan">7. Tampilkan nama orang yang memiliki nama paling panjang (pada row atas), dan nama orang paling pendek (pada row setelahnya). Gelar menjadi bagian dari nama. Jika ada lebih dari satu nama yang paling panjang atau paling pendek, harus ditampilkan semuanya. Nama kolom yang harus ditampilkan: nama_pelanggan.</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT nama_pelanggan 
+FROM ms_pelanggan 
+WHERE LENGTH(nama_pelanggan) IN (
+    (SELECT MAX(LENGTH(nama_pelanggan)) FROM ms_pelanggan),
+    (SELECT MIN(LENGTH(nama_pelanggan)) FROM ms_pelanggan)
+) 
+ORDER BY LENGTH(nama_pelanggan) DESC;
+</code></pre></div></div>
+<h3 id="8-tampilkan-produk-yang-paling-banyak-terjual-dari-segi-kuantitas-jika-ada-lebih-dari-1-produk-dengan-nilai-yang-sama-tampilkan-semua-produk-tersebut-nama-kolom-yang-harus-ditampilkan-kode_produk-nama_produktotal_qty">8. Tampilkan produk yang paling banyak terjual dari segi kuantitas. Jika ada lebih dari 1 produk dengan nilai yang sama, tampilkan semua produk tersebut. Nama kolom yang harus ditampilkan: kode_produk, nama_produk,total_qty.</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT
+    ms_produk.kode_produk,
+    ms_produk.nama_produk,
+    SUM(tr_penjualan_detail.qty) AS total_qty
+FROM
+    ms_produk
+    INNER JOIN tr_penjualan_detail ON ms_produk.kode_produk = tr_penjualan_detail.kode_produk
+GROUP BY
+    ms_produk.kode_produk,
+    ms_produk.nama_produk
+HAVING
+    SUM(tr_penjualan_detail.qty) &gt; 2;
+</code></pre></div></div>
+<h3 id="9-siapa-saja-pelanggan-yang-paling-banyak-menghabiskan-uangnya-untuk-belanja-jika-ada-lebih-dari-1-pelanggan-dengan-nilai-yang-sama-tampilkan-semua-pelanggan-tersebut-nama-kolom-yang-harus-ditampilkan-kode_pelanggan-nama_pelanggan-total_harga">9. Siapa saja pelanggan yang paling banyak menghabiskan uangnya untuk belanja? Jika ada lebih dari 1 pelanggan dengan nilai yang sama, tampilkan semua pelanggan tersebut. Nama kolom yang harus ditampilkan: kode_pelanggan, nama_pelanggan, total_harga.</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT
+    tr_penjualan.kode_pelanggan,
+    ms_pelanggan.nama_pelanggan,
+    SUM(
+        tr_penjualan_detail.qty * tr_penjualan_detail.harga_satuan
+    ) AS total_harga
+FROM
+    ms_pelanggan
+    INNER JOIN tr_penjualan USING (kode_pelanggan)
+    INNER JOIN tr_penjualan_detail USING (kode_transaksi)
+GROUP BY
+    tr_penjualan.kode_pelanggan,
+    ms_pelanggan.nama_pelanggan
+ORDER BY
+    total_harga DESC 
+LIMIT 1;
+</code></pre></div></div>
+<h3 id="10-tampilkan-daftar-pelanggan-yang-belum-pernah-melakukan-transaksinama-kolom-yang-harus-ditampilkan-kode_pelanggan-nama_pelanggan-alamat">10. Tampilkan daftar pelanggan yang belum pernah melakukan transaksi.Nama kolom yang harus ditampilkan: kode_pelanggan, nama_pelanggan, alamat.</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT kode_pelanggan, nama_pelanggan, alamat
+FROM ms_pelanggan
+WHERE kode_pelanggan NOT IN (SELECT kode_pelanggan FROM tr_penjualan)
+</code></pre></div></div>
+<h3 id="11-tampilkan-transaksi-transaksi-yang-memiliki-jumlah-item-produk-lebih-dari-1-jenis-produk-dengan-lain-kalimat-tampilkan-transaksi-transaksi-yang-memiliki-jumlah-baris-data-pada-table-tr_penjualan_detail-lebih-dari-satu-nama-kolom-yang-harus-ditampilkan--kode_transaksi-kode_pelanggan-nama_pelanggan-tanggal_transaksi-jumlah_detail">11. Tampilkan transaksi-transaksi yang memiliki jumlah item produk lebih dari 1 jenis produk. Dengan lain kalimat, tampilkan transaksi-transaksi yang memiliki jumlah baris data pada table tr_penjualan_detail lebih dari satu. Nama kolom yang harus ditampilkan:  kode_transaksi, kode_pelanggan, nama_pelanggan, tanggal_transaksi, jumlah_detail</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT tr_penjualan.kode_transaksi, tr_penjualan.kode_pelanggan, ms_pelanggan.nama_pelanggan, tr_penjualan.tanggal_transaksi, COUNT(tr_penjualan_detail.kode_produk) as jumlah_detail	
+FROM tr_penjualan 
+INNER JOIN tr_penjualan_detail on tr_penjualan_detail.kode_transaksi=tr_penjualan.kode_transaksi
+INNER JOIN ms_pelanggan on ms_pelanggan.kode_pelanggan=tr_penjualan.kode_pelanggan
+GROUP BY tr_penjualan.kode_transaksi,
+    tr_penjualan.kode_pelanggan,
+    ms_pelanggan.nama_pelanggan,
+    tr_penjualan.tanggal_transaksi
+
+HAVING COUNT(tr_penjualan_detail.kode_produk) &gt; 1
+</code></pre></div></div>

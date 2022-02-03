@@ -1,0 +1,309 @@
+<p>Setelah melakukan persiapan library dan membaca data pada <a href="/data%20science/2021/07/19/customer-segmentation-with-python">part 1</a> selanjutnya kita akan lakukan explorasi data.</p>
+
+<h2 id="melakukan-eksplorasi-data">Melakukan Eksplorasi Data</h2>
+<p>Lakukan eksplorasi data untuk lebih mengenal dataset yang akan digunakan. Lakukan eksplorasi untuk data numerik dan juga data kategorikal.</p>
+
+<h3 id="eksplorasi-data-numerik">Eksplorasi Data Numerik</h3>
+<p>Pertama-tama perlu melihat distribusi data dari data yang berjenis numerik. Gunakan boxplot dan juga histogram untuk melihat distribusi datanya. Untuk melihat grafik tersebut, perlu disiapkan kolom mana yang merupakan numerik, kemudian menggunakan library seaborn untuk membuat plot masing-masing kolom numerik, yaitu <em>‘Umur’</em> dan <em>‘NilaiBelanjaSetahun’</em>.</p>
+
+<p>Buat grafik boxplot dan histogram untuk kolom <em>Umur</em> dan juga <em>NilaiBelanjaSetahun</em>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sns</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s">'white'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">clf</span><span class="p">()</span>
+  
+<span class="c1"># Fungsi untuk membuat plot  
+</span><span class="k">def</span> <span class="nf">observasi_num</span><span class="p">(</span><span class="n">features</span><span class="p">):</span>  
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">kol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">features</span><span class="p">):</span>
+	    <span class="n">sns</span><span class="p">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">kol</span><span class="p">],</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+	    <span class="n">sns</span><span class="p">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">kol</span><span class="p">],</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>   
+	    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">].</span><span class="n">set_title</span><span class="p">(</span><span class="s">'mean = %.2f</span><span class="se">\n</span><span class="s"> median = %.2f</span><span class="se">\n</span><span class="s"> std = %.2f'</span><span class="o">%</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">kol</span><span class="p">].</span><span class="n">mean</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="n">kol</span><span class="p">].</span><span class="n">median</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="n">kol</span><span class="p">].</span><span class="n">std</span><span class="p">()))</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">setp</span><span class="p">(</span><span class="n">axs</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>  
+  
+<span class="c1"># Memanggil fungsi untuk membuat Plot untuk data numerik  
+</span><span class="n">kolom_numerik</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Umur'</span><span class="p">,</span><span class="s">'NilaiBelanjaSetahun'</span><span class="p">]</span> 
+<span class="n">observasi_num</span><span class="p">(</span><span class="n">kolom_numerik</span><span class="p">)</span> 
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  adjustable: {'box', 'datalim'}
+  agg_filter: a filter function, which takes a (m, n, 3) float array and a dpi value, and returns a (m, n, 3) array
+  alpha: scalar or None
+  anchor: 2-tuple of floats or {'C', 'SW', 'S', 'SE', ...}
+  animated: bool
+  aspect: {'auto'} or num
+  autoscale_on: bool
+  autoscalex_on: bool
+  autoscaley_on: bool
+  axes_locator: Callable[[Axes, Renderer], Bbox]
+  axisbelow: bool or 'line'
+  box_aspect: float or None
+  clip_box: `.Bbox`
+  clip_on: bool
+  clip_path: Patch or (Path, Transform) or None
+  contains: unknown
+  facecolor or fc: color
+  figure: `.Figure`
+  frame_on: bool
+  gid: str
+  in_layout: bool
+  label: object
+  navigate: bool
+  navigate_mode: unknown
+  path_effects: `.AbstractPathEffect`
+  picker: None or bool or float or callable
+  position: [left, bottom, width, height] or `~matplotlib.transforms.Bbox`
+  prop_cycle: unknown
+  rasterization_zorder: float or None
+  rasterized: bool
+  sketch_params: (scale: float, length: float, randomness: float)
+  snap: bool or None
+  subplotspec: unknown
+  title: str
+  transform: `.Transform`
+  url: str
+  visible: bool
+  xbound: unknown
+  xlabel: str
+  xlim: (bottom: float, top: float)
+  xmargin: float greater than -0.5
+  xscale: {"linear", "log", "symlog", "logit", ...} or `.ScaleBase`
+  xticklabels: unknown
+  xticks: unknown
+  ybound: unknown
+  ylabel: str
+  ylim: (bottom: float, top: float)
+  ymargin: float greater than -0.5
+  yscale: {"linear", "log", "symlog", "logit", ...} or `.ScaleBase`
+  yticklabels: unknown
+  yticks: unknown
+  zorder: float
+
+
+
+&lt;Figure size 432x288 with 0 Axes&gt;
+</code></pre></div></div>
+
+<p><img src="https://lh3.googleusercontent.com/-J7ZOaYg-7dw/YPOv2UwQfoI/AAAAAAAAVyw/mkQKM4tnipI2YvgY59vq3SPAMnqcdsgvgCLcBGAsYHQ/w320-h291/data_science_in_marketing_customer_segmentation_with_python_9_3.png" alt="data_science_in_marketing_customer_segmentation_with_python_boxplot" width="500" /></p>
+
+<p><br />
+<br />
+<br /></p>
+
+<h3 id="eksplorasi-data-kategorikal">Eksplorasi Data Kategorikal</h3>
+<p>Selain data numerikal, perlu dilihat juga sebaran data pada kolom-kolom yang memiliki jenis kategorikal yaitu Jenis Kelamin, Profesi dan Tipe Residen, hal ini dapat dilakukan dengan menggunakan method countplot dari library seaborn.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sns</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s">'white'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">clf</span><span class="p">()</span>
+  
+<span class="c1"># Menyiapkan kolom kategorikal  
+</span><span class="n">kolom_kategorikal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Jenis Kelamin'</span><span class="p">,</span><span class="s">'Profesi'</span><span class="p">,</span><span class="s">'Tipe Residen'</span><span class="p">]</span>  
+
+<span class="c1"># Membuat canvas
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span> 
+
+<span class="c1"># Membuat plot untuk setiap kolom kategorikal  
+</span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">kol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kolom_kategorikal</span><span class="p">):</span>  
+    <span class="c1"># Membuat Plot
+</span>    <span class="n">sns</span><span class="p">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">kol</span><span class="p">],</span> <span class="n">order</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">kol</span><span class="p">].</span><span class="n">value_counts</span><span class="p">().</span><span class="n">index</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>  
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">set_title</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">Count Plot %s</span><span class="se">\n</span><span class="s">'</span><span class="o">%</span><span class="p">(</span><span class="n">kol</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>  
+      
+    <span class="c1"># Memberikan anotasi  
+</span>    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">patches</span><span class="p">:</span>  
+        <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">annotate</span><span class="p">(</span><span class="nb">format</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">get_height</span><span class="p">(),</span> <span class="s">'.0f'</span><span class="p">),</span>  
+                        <span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">p</span><span class="p">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">get_height</span><span class="p">()),</span>  
+                        <span class="n">ha</span> <span class="o">=</span> <span class="s">'center'</span><span class="p">,</span>  
+                        <span class="n">va</span> <span class="o">=</span> <span class="s">'center'</span><span class="p">,</span>  
+                        <span class="n">xytext</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>  
+                        <span class="n">textcoords</span> <span class="o">=</span> <span class="s">'offset points'</span><span class="p">)</span> 
+          
+    <span class="c1"># Setting Plot  
+</span>    <span class="n">sns</span><span class="p">.</span><span class="n">despine</span><span class="p">(</span><span class="n">right</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">top</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>  
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">axes</span><span class="p">.</span><span class="n">yaxis</span><span class="p">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span> 
+    <span class="n">plt</span><span class="p">.</span><span class="n">setp</span><span class="p">(</span><span class="n">axs</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="c1"># Tampilkan plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  adjustable: {'box', 'datalim'}
+  agg_filter: a filter function, which takes a (m, n, 3) float array and a dpi value, and returns a (m, n, 3) array
+  alpha: scalar or None
+  anchor: 2-tuple of floats or {'C', 'SW', 'S', 'SE', ...}
+  animated: bool
+  aspect: {'auto'} or num
+  autoscale_on: bool
+  autoscalex_on: bool
+  autoscaley_on: bool
+  axes_locator: Callable[[Axes, Renderer], Bbox]
+  axisbelow: bool or 'line'
+  box_aspect: float or None
+  clip_box: `.Bbox`
+  clip_on: bool
+  clip_path: Patch or (Path, Transform) or None
+  contains: unknown
+  facecolor or fc: color
+  figure: `.Figure`
+  frame_on: bool
+  gid: str
+  in_layout: bool
+  label: object
+  navigate: bool
+  navigate_mode: unknown
+  path_effects: `.AbstractPathEffect`
+  picker: None or bool or float or callable
+  position: [left, bottom, width, height] or `~matplotlib.transforms.Bbox`
+  prop_cycle: unknown
+  rasterization_zorder: float or None
+  rasterized: bool
+  sketch_params: (scale: float, length: float, randomness: float)
+  snap: bool or None
+  subplotspec: unknown
+  title: str
+  transform: `.Transform`
+  url: str
+  visible: bool
+  xbound: unknown
+  xlabel: str
+  xlim: (bottom: float, top: float)
+  xmargin: float greater than -0.5
+  xscale: {"linear", "log", "symlog", "logit", ...} or `.ScaleBase`
+  xticklabels: unknown
+  xticks: unknown
+  ybound: unknown
+  ylabel: str
+  ylim: (bottom: float, top: float)
+  ymargin: float greater than -0.5
+  yscale: {"linear", "log", "symlog", "logit", ...} or `.ScaleBase`
+  yticklabels: unknown
+  yticks: unknown
+  zorder: float
+  adjustable: {'box', 'datalim'}
+  agg_filter: a filter function, which takes a (m, n, 3) float array and a dpi value, and returns a (m, n, 3) array
+  alpha: scalar or None
+  anchor: 2-tuple of floats or {'C', 'SW', 'S', 'SE', ...}
+  animated: bool
+  aspect: {'auto'} or num
+  autoscale_on: bool
+  autoscalex_on: bool
+  autoscaley_on: bool
+  axes_locator: Callable[[Axes, Renderer], Bbox]
+  axisbelow: bool or 'line'
+  box_aspect: float or None
+  clip_box: `.Bbox`
+  clip_on: bool
+  clip_path: Patch or (Path, Transform) or None
+  contains: unknown
+  facecolor or fc: color
+  figure: `.Figure`
+  frame_on: bool
+  gid: str
+  in_layout: bool
+  label: object
+  navigate: bool
+  navigate_mode: unknown
+  path_effects: `.AbstractPathEffect`
+  picker: None or bool or float or callable
+  position: [left, bottom, width, height] or `~matplotlib.transforms.Bbox`
+  prop_cycle: unknown
+  rasterization_zorder: float or None
+  rasterized: bool
+  sketch_params: (scale: float, length: float, randomness: float)
+  snap: bool or None
+  subplotspec: unknown
+  title: str
+  transform: `.Transform`
+  url: str
+  visible: bool
+  xbound: unknown
+  xlabel: str
+  xlim: (bottom: float, top: float)
+  xmargin: float greater than -0.5
+  xscale: {"linear", "log", "symlog", "logit", ...} or `.ScaleBase`
+  xticklabels: unknown
+  xticks: unknown
+  ybound: unknown
+  ylabel: str
+  ylim: (bottom: float, top: float)
+  ymargin: float greater than -0.5
+  yscale: {"linear", "log", "symlog", "logit", ...} or `.ScaleBase`
+  yticklabels: unknown
+  yticks: unknown
+  zorder: float
+  adjustable: {'box', 'datalim'}
+  agg_filter: a filter function, which takes a (m, n, 3) float array and a dpi value, and returns a (m, n, 3) array
+  alpha: scalar or None
+  anchor: 2-tuple of floats or {'C', 'SW', 'S', 'SE', ...}
+  animated: bool
+  aspect: {'auto'} or num
+  autoscale_on: bool
+  autoscalex_on: bool
+  autoscaley_on: bool
+  axes_locator: Callable[[Axes, Renderer], Bbox]
+  axisbelow: bool or 'line'
+  box_aspect: float or None
+  clip_box: `.Bbox`
+  clip_on: bool
+  clip_path: Patch or (Path, Transform) or None
+  contains: unknown
+  facecolor or fc: color
+  figure: `.Figure`
+  frame_on: bool
+  gid: str
+  in_layout: bool
+  label: object
+  navigate: bool
+  navigate_mode: unknown
+  path_effects: `.AbstractPathEffect`
+  picker: None or bool or float or callable
+  position: [left, bottom, width, height] or `~matplotlib.transforms.Bbox`
+  prop_cycle: unknown
+  rasterization_zorder: float or None
+  rasterized: bool
+  sketch_params: (scale: float, length: float, randomness: float)
+  snap: bool or None
+  subplotspec: unknown
+  title: str
+  transform: `.Transform`
+  url: str
+  visible: bool
+  xbound: unknown
+  xlabel: str
+  xlim: (bottom: float, top: float)
+  xmargin: float greater than -0.5
+  xscale: {"linear", "log", "symlog", "logit", ...} or `.ScaleBase`
+  xticklabels: unknown
+  xticks: unknown
+  ybound: unknown
+  ylabel: str
+  ylim: (bottom: float, top: float)
+  ymargin: float greater than -0.5
+  yscale: {"linear", "log", "symlog", "logit", ...} or `.ScaleBase`
+  yticklabels: unknown
+  yticks: unknown
+  zorder: float
+
+&lt;Figure size 432x288 with 0 Axes&gt;
+</code></pre></div></div>
+
+<p><img src="https://lh3.googleusercontent.com/-7QrioQh0riU/YPOv2iyDkpI/AAAAAAAAVy8/diM9pKQnsZAMLPXFEdxE9DMUp7dKj1M2QCLcBGAsYHQ/s16000/data_science_in_marketing_customer_segmentation_with_python_11_3.png" alt="data science in marketing customer segmentation with python count plot" /></p>
+
+<p><br />
+<br /></p>
+
+<h2 id="kesimpulan">Kesimpulan</h2>
+<p>Dari hasil explorasi data tersebut didapat informasi bahwa :</p>
+<ul>
+  <li>Rata-rata dari umur pelanggan adalah 37.5 tahun</li>
+  <li>Rata-rata dari nilai belanja setahun pelanggan adalah 7,069,874.82</li>
+  <li>Jenis kelamin pelanggan di dominasi oleh wanita sebanyak 41 orang (82%) dan laki-laki sebanyak 9 orang (18%)</li>
+  <li>Profesi terbanyak adalah Wiraswasta(40%) diikuti Profesional (36%) dan lainnya sebanyak 24%</li>
+  <li>Dari seluruh pelanggan 64% dari mereka tinggal di cluster dan 36% nya tinggal di sektor.</li>
+</ul>
+
+<h3 id="tips">Tips:</h3>
+<p>Dengan eksplorasi data kita dapat mengenal lebih jauh tentang data yang ada.
+Proses eskplorasi data bisa berupa univariate maupun multivariate data eksplorasi. Eksplorasi Data Univariate melihat karakteristik tiap-tiap feature, misalnya dengan melihat statistik destriptif, membuat histogram, kdeplot, count plot maupun boxplot. Sedangkan untuk Eksplorasi Data Multivariate, untuk melihat hubungan tiap variabel dengan variabel lainnya, misalkan dengan membuat korelasi matrix, melihat predictive power, cross tabulasi dan lainnya.</p>
+
+<p>Lanjut ke <a href="/data%20science/2021/07/19/customer-segmentation-with-python-part3">persiapan permodelan</a></p>

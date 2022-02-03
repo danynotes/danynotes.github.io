@@ -1,0 +1,163 @@
+<h1 id="data-science-challenge-with-python">Data Science Challenge with Python</h1>
+
+<p>Project ini merupakan kerjasama DQLab dengan CTCorp. Didalam project ini bertujuan untuk menguji kemampuan data science yang terdiri dari :</p>
+
+<ol>
+  <li><strong>Test Probabilitas</strong>, dirancang untuk memperlihatkan kemampuan dalam mengkonseptualisasikan pengetahuan dalam bidang probabilitas.</li>
+  <li><strong>Test Statistik</strong>, dirancang untuk memperlihatkan pengetahuan member terkait dasar-dasar ilmu statistik</li>
+  <li><strong>Test Interpretasi Model</strong>, dirancang untuk memperlihatkan kemampuan member dalam memberikan insight/kesimpulan dan pengambilan keputusan terkait dengan model yang dibangun melalui penerapan data science.</li>
+  <li><strong>Test Pemrograman</strong>, yang dirancang untuk memperlihatkan kemampuan member dalam menerapkan logical thinking (berfikir logis) melalui kode-kode program yang ditanyakan.</li>
+</ol>
+
+<h2 id="i-probabilitas">I. Probabilitas</h2>
+<h3 id="1-terdapat-23-tim-rugby-yang-bermain-dalam-sebuah-turnamen-berapakah-banyaknya-pertandingan-yang-harus-dimainkan-agar-diketahui-siapa-pemenangnya-">1. Terdapat 23 tim rugby yang bermain dalam sebuah turnamen. Berapakah banyaknya pertandingan yang harus dimainkan agar diketahui siapa pemenangnya ?</h3>
+
+<p>Penyelesaian :</p>
+
+<p>Pertandingan turnamen dengan sistem gugur maka jumlah pertandigan yang harus dimainkan adalah n - 1.<br />
+Jadi banyaknya pertandingan yang harus dimainkan adalah : 23 - 1 = <strong>22</strong></p>
+
+<h3 id="2-setiap-interval-15-menit-terdapat-20-probabilitas-bahwa-anda-dapat-melihat-satu-bintang-berekor-berapakah-probabilitasnya-anda-dapat-melihat-setidaknya-satu-bintang-berekor-tiap-satu-jam-">2. Setiap interval 15 menit, terdapat 20% probabilitas bahwa Anda dapat melihat satu bintang berekor. Berapakah probabilitasnya Anda dapat melihat setidaknya satu bintang berekor tiap satu jam ?</h3>
+
+<p>Penyelesaian :</p>
+
+<p>n (number of trials) = 60 menit / 15 menit = 4 ;<br />
+P (probability of success) = 20% = 0.2<br />
+x &gt;= 1 (1,2,3,4)</p>
+
+<p>Binomial formula : P(X=x) = n! / x!(n - x)! * P<sup>x</sup> * (1 - P)<sup>n-x</sup></p>
+
+<p>Comulative Probability : P(X &gt;= 1) = P(X=1) + P(X=2) + P(X=3) + P(X=4) 
+                                   = 0.4096 + 0.1536 + 0.0256 + 0.0016
+                                   = 0.5904<br />
+Jadi probabilitasnya anda dapat melihat setidaknya satu bintang berekor tiap satu jam adalah <strong>0.5904</strong></p>
+
+<h2 id="ii-statistik">II. Statistik</h2>
+<h3 id="1-manakah-pernyataan-yang-benar-dari-pilihan-dibawah-ini-">1. Manakah pernyataan yang benar dari pilihan dibawah ini :</h3>
+<h3 id="--rata-rata-adalah-ukuran-tendensi-pusat-suatu-data">- Rata-rata adalah ukuran tendensi pusat suatu data</h3>
+<h3 id="--rata-rata-empiris-berhubungan-dengan-permusatan-variable-acak">- Rata-rata empiris berhubungan dengan permusatan variable acak</h3>
+<h3 id="--standar-deviasi-empiris-mengukur-besarnya-sebaran-data">- Standar deviasi empiris mengukur besarnya sebaran data</h3>
+<h3 id="--semua-benar">- Semua benar</h3>
+
+<p>Penyelesaian : <strong>Semua Benar</strong></p>
+
+<h3 id="2-setelah-mengkaji-perilaku-sebuah-populasi-anda-telah-mengidentifikasi-empat-jenis-individu-spesifik-yang-bernilai-pada-kajian-anda-anda-akan-menentukan-semua-pengguna-yang-paling-serupa-untuk-setiap-jenis-individu-itu-algoritma-manakah-yang-paling-cocok-untuk-kajian-ini-">2. Setelah mengkaji perilaku sebuah populasi, anda telah mengidentifikasi empat jenis individu spesifik yang bernilai pada kajian anda. Anda akan menentukan semua pengguna yang paling serupa untuk setiap jenis individu itu. Algoritma manakah yang paling cocok untuk kajian ini ?</h3>
+
+<p>Penyelesaian : <strong>Algoritma K-Means clustering</strong> karena algoritma ini mempartisi data ke dalam cluster sehingga data yang memiliki karakteristik sama dikelompokan kedalam cluster yang sama.</p>
+
+<h3 id="3-dengan-menambahkan-fitur-yang-tidak-penting-ke-model-regresi-yang-telah-dibuat-akan-menghasilkan-kenaikan-nilai-r-square-atau-penurunan-nilai-r-square-">3. Dengan menambahkan fitur yang tidak penting ke model regresi yang telah dibuat akan menghasilkan kenaikan nilai R-Square atau penurunan nilai R-Square ?</h3>
+
+<p>Penyelesaian : Nilai R-Square akan selalu meningkat dengan adanya penambahan variable bebas dalam suatu model, jadi pernyataan yang benar adalah <strong>kenaikan nilai R-square</strong>.</p>
+
+<h3 id="boosting">Boosting</h3>
+<h3 id="4-manakah-yang-termasuk-dari-algoritma-berikut-yang-merupakan-sub-kelas-largest-boost-dalam-keluarga-algoritma-boosting-">4. Manakah yang termasuk dari algoritma berikut yang merupakan sub-kelas largest boost dalam keluarga algoritma boosting ?</h3>
+
+<p>Penyelesaian : <strong>gradient boosting</strong>.</p>
+
+<h3 id="5-untuk-k-cross-validation-semakin-besar-nilai-k-menghasilkan-bias-yang-lebih-besar-juga-benar-atau-salahkah-pernyataan-di-atas">5. Untuk <strong><em>k</em></strong> cross-validation, semakin besar nilai <strong><em>k</em></strong> menghasilkan bias yang lebih besar juga. Benar atau salahkah pernyataan di atas?</h3>
+
+<p>Penyelesaian : <strong><em>k</em></strong> merupakan jumlah iterasi, semakin banyak iterasi dataset yang di evaluasi semakin besar bias yang dihasilkan.</p>
+
+<h3 id="interpretasi-model">Interpretasi Model</h3>
+<h3 id="6-jika-anda-bekerja-pada-suatu-proyek-yang-menggunakak-permasalahan-binary-classification-kemudian-anda-mentraining-sebuah-model-pada-training-dataset-dan-kemudian-memperoleh-confusion-matrix-setelah-menerapkannya-pada-validation-dataset-berikut-ini">6. Jika anda bekerja pada suatu proyek yang menggunakak permasalahan <strong><em>binary classification</em></strong>. Kemudian anda mentraining sebuah model pada training dataset dan kemudian memperoleh confusion matrix setelah menerapkannya pada validation dataset, berikut ini</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>N=165</strong></th>
+      <th style="text-align: center"><strong>Predicted: No</strong></th>
+      <th style="text-align: center"><strong>Predicted:Yes</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Actual: No</td>
+      <td style="text-align: center">50</td>
+      <td style="text-align: center">10</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Actual: Yes</td>
+      <td style="text-align: center">5</td>
+      <td style="text-align: center">100</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Berdasarkan pada confusion matrix tersebut, pilihlah jawaban berikut ini mana yang memberikan prediksi yang benar ?</p>
+<ol>
+  <li><strong><em>Accuracy</em></strong> adalah ~0.91</li>
+  <li><strong><em>Misclassification rate</em></strong> adalah ~0.91</li>
+  <li><strong><em>False-positive rate</em></strong> adalah ~0.95</li>
+  <li><strong><em>True positive rate</em></strong> adalah ~0.95</li>
+</ol>
+
+<p>Penyelesaian :<br />
+Jawaban yang benar adalah <strong>1 dan 4</strong>. penjelasanya sebagai berikut :</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">TP</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">TN</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">FP</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">FN</span> <span class="o">=</span> <span class="mi">5</span> 
+
+<span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">metric</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Accurate"</span><span class="p">,</span> <span class="s">"miss_classification"</span><span class="p">,</span> <span class="s">"false_positive_rate"</span><span class="p">,</span> <span class="s">"true_positive_rate"</span><span class="p">]</span>
+<span class="n">result</span><span class="p">[</span><span class="n">metric</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">TP</span> <span class="o">+</span> <span class="n">TN</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">TP</span> <span class="o">+</span> <span class="n">TN</span> <span class="o">+</span> <span class="n">FP</span> <span class="o">+</span> <span class="n">FN</span><span class="p">)</span>
+<span class="n">result</span><span class="p">[</span><span class="n">metric</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">FP</span> <span class="o">+</span> <span class="n">FN</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">TP</span> <span class="o">+</span> <span class="n">TN</span> <span class="o">+</span> <span class="n">FP</span> <span class="o">+</span> <span class="n">FN</span><span class="p">)</span>
+<span class="n">result</span><span class="p">[</span><span class="n">metric</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span>  <span class="n">FP</span>  <span class="o">/</span> <span class="p">(</span><span class="n">FP</span> <span class="o">+</span> <span class="n">TN</span><span class="p">)</span>
+<span class="n">result</span><span class="p">[</span><span class="n">metric</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span> <span class="o">=</span>  <span class="n">TP</span> <span class="o">/</span> <span class="p">(</span><span class="n">TP</span> <span class="o">+</span> <span class="n">FN</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">metric</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s"> is </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="n">metric</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="p">:</span> <span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">metric</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s"> is </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="n">metric</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="p">:</span> <span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">metric</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s"> is </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="n">metric</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="p">:</span> <span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">metric</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s"> is </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="n">metric</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span> <span class="p">:</span> <span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Accurate is  0.91
+miss_classification is  0.09
+false_positive_rate is  0.17
+true_positive_rate is  0.95
+</code></pre></div></div>
+
+<h2 id="dict-data-type">Dict data type</h2>
+<h3 id="7-tuliskanlah-kode-python-di-code-editor-yang-akan-menyatukan-tiga-dictionay-berikut-">7. Tuliskanlah kode python di code editor yang akan menyatukan tiga dictionay berikut :</h3>
+<p>dic1 = {1:10, 2:20}
+dic2 = {3:30, 4:40}
+dic3 = {5:50, 6:60}</p>
+
+<p>menjadi satu dictionay dalam dic4.</p>
+
+<p>Penyelesaian :</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dic1</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">20</span><span class="p">}</span>
+<span class="n">dic2</span> <span class="o">=</span> <span class="p">{</span><span class="mi">3</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">40</span><span class="p">}</span>
+<span class="n">dic3</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">60</span><span class="p">}</span>
+<span class="n">dic4</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">dic1</span><span class="p">,</span> <span class="n">dic2</span><span class="p">,</span> <span class="n">dic3</span><span class="p">):</span>
+    <span class="n">dic4</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">dic4</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60}
+</code></pre></div></div>
+
+<h3 id="8-tuliskan-sebuah-fungsi-python-yang-digunakan-untuk-menghitung-n-deret-pertama-fibonacci-yang-dimulai-dari-0">8. Tuliskan sebuah fungsi python yang digunakan untuk menghitung n deret pertama Fibonacci yang dimulai dari 0.</h3>
+<p>Inpu : n = 7
+Output : 33</p>
+
+<p>Penyelesaian :</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">calculateSum</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">fibo</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">fibo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># Initialisasi hasil ke dalam variabel sm
+</span>    <span class="n">sm</span> <span class="o">=</span> <span class="n">fibo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">fibo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Tambahkan suku-suku berikutnya
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">fibo</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">fibo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">fibo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">sm</span> <span class="o">+=</span> <span class="n">fibo</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">sm</span>
+<span class="c1"># Evaluasi hasil deret untuk n = 7    
+</span><span class="k">print</span><span class="p">(</span><span class="n">calculateSum</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span>
+</code></pre></div></div>

@@ -1,0 +1,91 @@
+<p>Dalam membuat model machine learning sering kali terjadi model yang dibuat menunjutkan hasil anomaly <strong><em>Overfitting</em></strong> atau <strong><em>Underfitting</em></strong></p>
+
+<h2 id="overfitting">Overfitting</h2>
+
+<p>Overfitting adalah kondisi dimana model yang dibuat hampir sempurna kecocokanya dengan data <strong><em>training</em></strong> atau fokus model hanya pada <strong><em>training</em></strong> data tertentu, tetapi tidak valid dalam validasi dengan test dataset atau data baru lainnya.</p>
+
+<h2 id="underfitting">Underfitting</h2>
+
+<p>Underfitting adalah kondisi dimana model gagal menangkap perbedaan pola penting dalam <strong><em>training</em></strong> dataset, sehingga tidak bisa melakukan prediksi dengan tepat dalam test dataset.</p>
+
+<p>Grafik berikut menggambarkan <strong><em>Underfitting</em></strong> dan <strong><em>Overfitting</em></strong></p>
+
+<p><img src="../assets/media/model-underfitting-overfitting.png" alt="underfitting overfitting" /></p>
+
+<h2 id="mengatasi-underfitting-atau-overfitting">Mengatasi Underfitting atau Overfitting</h2>
+
+<p>Untuk mengontrol terjadinya anomaly <strong><em>underfitting</em></strong> atau <strong><em>overfitting</em></strong> sehingga didapat akurasi model dilakukan dengan cara menentukan argumen max_nodes atau titik terendah dari test error.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_absolute_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeRegressor</span>
+
+
+<span class="c1"># read file
+</span>
+<span class="n">file_path</span><span class="o">=</span><span class="s">'train.csv'</span>
+<span class="n">home_data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+<span class="c1"># create target object and call it "y"
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">home_data</span><span class="p">.</span><span class="n">SalePrice</span>
+<span class="k">print</span><span class="p">(</span><span class="n">home_data</span><span class="p">.</span><span class="n">SalePrice</span><span class="p">)</span>
+
+<span class="c1"># create X
+</span><span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="s">'LotArea'</span><span class="p">,</span> <span class="s">'YearBuilt'</span><span class="p">,</span> <span class="s">'1stFlrSF'</span><span class="p">,</span><span class="s">'2ndFlrSF'</span><span class="p">,</span> <span class="s">'FullBath'</span><span class="p">,</span> <span class="s">'BedroomAbvGr'</span><span class="p">,</span> <span class="s">'TotRmsAbvGrd'</span><span class="p">]</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">home_data</span><span class="p">[</span><span class="n">features</span><span class="p">]</span>
+
+<span class="c1"># Split into validation and training data
+</span><span class="n">train_X</span><span class="p">,</span> <span class="n">val_X</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">val_y</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Specify Model
+</span><span class="n">iowa_model</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Fit Model
+</span><span class="n">iowa_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_X</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+
+<span class="c1"># Make validation predictions and calculate absolute error
+</span><span class="n">val_predictions</span> <span class="o">=</span> <span class="n">iowa_model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">val_X</span><span class="p">)</span>
+<span class="n">val_mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">val_predictions</span><span class="p">,</span> <span class="n">val_y</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Validation MAE:{:,.0f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">val_mae</span><span class="p">))</span>
+
+
+<span class="c1"># create function to compare the accuracy of models built with different values for max_leaf_nodes
+</span>
+<span class="k">def</span> <span class="nf">get_mae</span><span class="p">(</span><span class="n">max_leaf_nodes</span><span class="p">,</span> <span class="n">train_X</span><span class="p">,</span> <span class="n">val_X</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">val_y</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">(</span><span class="n">max_leaf_nodes</span><span class="o">=</span><span class="n">max_leaf_nodes</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_X</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+    <span class="n">prediction_val</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">val_X</span><span class="p">)</span>
+    <span class="n">mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">val_y</span><span class="p">,</span> <span class="n">prediction_val</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">mae</span><span class="p">)</span>
+
+<span class="c1"># step 1 compare different tree sizes
+</span><span class="n">candidate_max_leaf_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+
+<span class="c1"># write loop to find the ideal tree size
+</span><span class="n">scores</span> <span class="o">=</span> <span class="p">{</span><span class="n">leaf_size</span><span class="p">:</span> <span class="n">get_mae</span><span class="p">(</span><span class="n">leaf_size</span><span class="p">,</span> <span class="n">train_X</span><span class="p">,</span> <span class="n">val_X</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">val_y</span><span class="p">)</span> <span class="k">for</span> <span class="n">leaf_size</span> <span class="ow">in</span> <span class="n">candidate_max_leaf_nodes</span><span class="p">}</span>
+
+<span class="c1"># store the best value of max_leaf_node / titik terendah dari test error
+</span><span class="n">best_tree_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">scores</span><span class="p">.</span><span class="n">get</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Best Tree Size:{:,.0f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">best_tree_size</span><span class="p">))</span>
+
+<span class="c1"># step 2 Fit model using all data
+# Setelah mendapat titik terbaik untuk mengontrol underfitting atau overfitting,
+# selanjutnya terapkan best_tree_size pada model dengan menggunakan semua data.
+</span>
+<span class="n">final_model</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">(</span><span class="n">max_leaf_nodes</span><span class="o">=</span><span class="n">best_tree_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">final_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">final_val_predictions</span> <span class="o">=</span> <span class="n">final_model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">val_X</span><span class="p">)</span>
+<span class="n">final_val_mae</span> <span class="o">=</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">final_val_predictions</span><span class="p">,</span> <span class="n">val_y</span><span class="p">)</span>
+
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Max leaf nodes: %d  </span><span class="se">\t</span><span class="s"> Mean Absolute Error: %d"</span> <span class="o">%</span><span class="p">(</span><span class="n">best_tree_size</span><span class="p">,</span> <span class="n">final_val_mae</span><span class="p">))</span>
+
+</code></pre></div></div>
+
