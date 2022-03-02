@@ -7,7 +7,6 @@ description : Dealing Missing Values
 date: 2022-03-02 20:18:00 +0700
 ---
 
-# Menangani Nilai yang Hilang
 Beberapa hal yang menyebabkan data memiliki nilai yang hilang, diantaranya karena responden tidak memberikan informasi mengenai beberapa detail. 
 ***Machine learning libraries*** akan menghasilkan ***error*** jika kita membuat model dengan dataset yang memiliki nilai yang hilang. Jadi, data yang hilang dalam dataset harus di selesaikan sebelum membuat model. 
 
