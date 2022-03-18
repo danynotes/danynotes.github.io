@@ -81,6 +81,7 @@ Untuk mengatasi permasalahan penyimpanan file media di sistem ***containerizatio
         'cloudinary',
         'cloudinary_storage',
     ]
+    ```
 
 8. Konfigurasikan settings.py untuk menggunakan cloudinary.
     
