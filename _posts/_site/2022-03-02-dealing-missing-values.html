@@ -1,0 +1,144 @@
+<p>Beberapa hal yang menyebabkan data memiliki nilai yang hilang, diantaranya karena responden tidak memberikan informasi mengenai beberapa detail. 
+<strong><em>Machine learning libraries</em></strong> akan menghasilkan <strong><em>error</em></strong> jika kita membuat model dengan dataset yang memiliki nilai yang hilang. Jadi, data yang hilang dalam dataset harus di selesaikan sebelum membuat model.</p>
+
+<h2 id="ada-2-pendekatan-untuk-menyelesaikan-nilai-yang-hilang">Ada 2 pendekatan untuk menyelesaikan nilai yang hilang</h2>
+
+<h3 id="1-cara-sederhana--drop-kolom-yang-memiliki-nilai-hilang">1) Cara sederhana : <strong><em>Drop</em></strong> kolom yang memiliki nilai hilang.</h3>
+
+<p>Dengan pendekatan ini, model berpotensi kehilangan banyak informasi yang mungkin bermanfaat. Misalkan terdapat dataset dengan 10.000 baris, dimana terdapat satu kolom penting yang beberapa baris tidak memiliki isi, dengan pendekatan ini satu kolom tersebut akan di <strong><em>drop</em></strong> sepenuhnya.</p>
+
+<p>contoh kode sebagai berikut :</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_absolute_error</span>
+
+<span class="c1"># Baca dataset
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'melb_data.csv'</span><span class="p">)</span>
+
+<span class="c1"># Tentukan target
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">Price</span>
+
+<span class="c1"># Untuk mempermudah kita hanya gunakan predictors yang bernilai numerik
+</span>
+<span class="n">melb_predictors</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'Price'</span><span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">melb_predictors</span><span class="p">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s">'object'</span><span class="p">])</span>
+
+<span class="c1"># Bagi data menjadi training dan validation subsets
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="c1"># Dapatkan kolom yang memiliki nilai yang hilang
+</span><span class="n">cols_with_missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">X_train</span><span class="p">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">X_train</span><span class="p">[</span><span class="n">col</span><span class="p">].</span><span class="n">isnull</span><span class="p">().</span><span class="nb">any</span><span class="p">()]</span>
+
+<span class="c1"># Drop kolom yang memiliki nilai hilang di training dan validation
+</span><span class="n">X_train_droped</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">cols_with_missing</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x_valid_droped</span> <span class="o">=</span> <span class="n">X_valid</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">cols_with_missing</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Buat fungsi untuk mengukur kualitas metode penanganan nilai yang hilang
+</span><span class="k">def</span> <span class="nf">score_dataset</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y_valid</span><span class="p">,</span> <span class="n">preds</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"MAE from Approach 1 (Drop columns with missing values):"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">score_dataset</span><span class="p">(</span><span class="n">reduced_X_train</span><span class="p">,</span> <span class="n">reduced_X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">))</span>
+
+</code></pre></div></div>
+<p>Hasil pendekatan pertama sebagai berikut :</p>
+
+<p>MAE from Approach 1 (Drop columns with missing values):</p>
+
+<p>183550.22137772635</p>
+
+<h3 id="2-pilihan-yang-lebih-baik--imputasi">2) Pilihan yang lebih baik : Imputasi</h3>
+
+<p>Imputasi mengisi nilai-nilai yang hilang dengan beberapa nilai, misalnya dengan mengisi nilai rata-rata di setiap kolom.</p>
+
+<p>Dalam beberapa kasus hasil imputasi tidak akan benar-benar tepat, tetapi biasanya mengarah ke model yang lebih akurat daripada melakukan drop pada kolom sepenuhnya.</p>
+
+<p>Contoh kode sebagai berikut, masih menggunakan dataset yang sama dengan pendekatan pertama.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+
+
+<span class="c1"># Imputasi
+</span><span class="n">myImputer</span> <span class="o">=</span> <span class="n">SimpleImputer</span><span class="p">()</span>
+
+<span class="n">imputed_X_train</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">myImputer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+<span class="n">imputed_X_valid</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">myImputer</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_valid</span><span class="p">))</span>
+
+<span class="c1"># Imputasi menyebabkan nama kolom hilang. kembalikan nama kolom :
+</span><span class="n">imputed_X_train</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">.</span><span class="n">columns</span>
+<span class="n">imputed_X_valid</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">X_valid</span><span class="p">.</span><span class="n">columns</span>
+
+<span class="c1"># check score MAE
+</span><span class="k">print</span><span class="p">(</span><span class="s">"MAE from Approach 2 (Imputation):"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">score_dataset</span><span class="p">(</span><span class="n">imputed_X_train</span><span class="p">,</span> <span class="n">imputed_X_valid</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">))</span>
+
+</code></pre></div></div>
+<p>Hasil pendekatan imputasi sebagai berikut :</p>
+
+<p>MAE from Approach 2 (Imputation):</p>
+
+<p>178166.46269899711</p>
+
+<p>Kita lihat jumlah baris dan jumlah kolom yang memiliki nilai hilang.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">X_train</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># Number of missing values in each column of training data
+</span><span class="n">missing_val_count_by_column</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_train</span><span class="p">.</span><span class="n">isnull</span><span class="p">().</span><span class="nb">sum</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">missing_val_count_by_column</span><span class="p">[</span><span class="n">missing_val_count_by_column</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+
+
+</code></pre></div></div>
+<p>Hasil nya :
+(10864, 12)</p>
+
+<p>Car               49</p>
+
+<p>BuildingArea    5156</p>
+
+<p>YearBuilt       4307</p>
+
+<p>dtype: int64</p>
+
+<p>Data training memiliki 10864 baris dan 12 kolom. Dimana ada 3 kolom yang memiliki nilai yang hilang. Hampir separuh baris dari masing-masing kolom yang nilai nya hilang, ini lah mengapa ketika melakukan pendekatan 1) untuk menangani nilai yang hilang akan menyebabkan potensi kehilangan informasi yang bermanfaat.</p>
+
+<pre><code class="language-Python"># Preprocess test data
+final_X_test = pd.DataFrame(myImputer.transform(X_test))
+
+preds_test = model.predict(final_X_test)
+
+output = pd.DataFrame({'Id': X_test.index, 'SalePrice': preds_test})
+print(output)
+
+</code></pre>
+
+<p>Id  SalePrice</p>
+
+<p>0     1461  125245.50</p>
+
+<p>1     1462  155237.00</p>
+
+<p>2     1463  180755.22</p>
+
+<p>3     1464  184071.50</p>
+
+<p>4     1465  197144.40</p>
+
+<p>…    …        …</p>
+
+<p>1454  2915   87277.12</p>
+
+<p>1455  2916   87025.50</p>
+
+<p>1456  2917  154283.87</p>
+
+<p>1457  2918  107723.50</p>
+
+<p>1458  2919  228591.59</p>

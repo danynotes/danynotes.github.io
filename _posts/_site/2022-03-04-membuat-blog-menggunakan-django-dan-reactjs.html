@@ -1,0 +1,666 @@
+<p>Note ini mengenai bagaimana membuat Website personal blog menggunakan django sebagai backend dan django REST framework sebagai Web APIs, serta di sisi frontend menggunakan ReactJS. Personal blog ini dibuat dengan fitur :</p>
+<ol>
+  <li>personal portfolio dengan menu : portfolio, list work, contact form.</li>
+  <li>Blog</li>
+</ol>
+
+<p>Project ini dibuat menggunakan Windows Subsystem for Linux Distributions (WSL 2) dengan distro Ubuntu 18.04 dan python 3.8.10.
+Database menggunakan PostgreSQL 13.0 running on Docker.</p>
+
+<h2 id="backend">Backend</h2>
+
+<p>Pertama-tama persiapkan dulu project environment.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">/</span><span class="err">$</span> <span class="n">mkdir</span> <span class="n">blog_project</span>
+<span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">/</span><span class="err">$</span> <span class="n">cd</span> <span class="n">blog_project</span>
+<span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="err">$</span> <span class="n">mkdir</span> <span class="n">backend</span>
+<span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="err">$</span> <span class="n">cd</span> <span class="n">backend</span>
+<span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="err">$</span> <span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="n">envblog</span>
+
+<span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="err">$</span> <span class="n">source</span> <span class="n">envblog</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+</code></pre></div></div>
+<p>Kemudian install requirements</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="err">$</span> <span class="n">install</span> <span class="n">django</span> <span class="n">django</span><span class="o">-</span><span class="n">cors</span><span class="o">-</span><span class="n">headers</span> <span class="n">djangorestframework</span> <span class="n">pillow</span> <span class="n">psycopg2</span> <span class="n">psycopg2</span><span class="o">-</span><span class="n">binary</span> <span class="n">django</span><span class="o">-</span><span class="n">summernote</span> <span class="n">requests</span>
+</code></pre></div></div>
+
+<p>Setelah process instalasi requirement selesai selanjutnya kita buat django project dan blog app.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="err">$</span> <span class="n">django</span><span class="o">-</span><span class="n">admin</span> <span class="n">startproject</span> <span class="n">blog_personal</span>
+<span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="err">$</span> <span class="n">cd</span> <span class="n">blog_personal</span>
+<span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="o">/</span><span class="n">blog_personal</span><span class="err">$</span> <span class="n">python</span> <span class="n">manage</span><span class="p">.</span><span class="n">py</span> <span class="n">startapp</span> <span class="n">blog</span>
+</code></pre></div></div>
+<p>Buat django SECRET_KEY</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="o">/</span><span class="n">blog_personal</span><span class="err">$</span> <span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s">'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</span>
+
+</code></pre></div></div>
+<p>Simpan hasil generate SECRET_KEY kedalam file .env bersama dengan variable lain yang digunakan di app.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># .env
+</span>
+<span class="n">SECRET_KEY</span><span class="o">=</span><span class="n">k</span><span class="err">!</span><span class="n">j1ymx8</span><span class="p">)</span><span class="n">lt92ivz9zgl</span><span class="o">+</span><span class="mi">2</span><span class="n">l4</span><span class="o">-</span><span class="n">c15f</span><span class="o">@@</span><span class="err">!$</span><span class="n">c_dj</span><span class="c1">#(4oz84anmj8+
+</span><span class="n">DJANGO_DEBUG</span><span class="o">=</span><span class="bp">True</span>
+<span class="n">DATABASE_USER</span><span class="o">=</span><span class="n">your_database_user</span>
+<span class="n">DATABASE_PASS</span><span class="o">=</span><span class="n">your_database_pass</span>
+<span class="n">DATABASE_NAME</span><span class="o">=</span><span class="n">your_database_name</span>
+<span class="n">DATABASE_PORT</span><span class="o">=</span><span class="n">your_database_port</span>
+<span class="n">DATABASE_HOST</span><span class="o">=</span><span class="n">localhost</span>
+<span class="n">ALLOWED_HOSTS</span><span class="o">=</span><span class="n">localhost</span><span class="p">,</span><span class="mf">127.0</span><span class="p">.</span><span class="mf">0.1</span>
+
+</code></pre></div></div>
+
+<p>Modifikasi file settings.py untuk membaca variable environment dari file .env</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># settings.py
+</span><span class="p">...</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">environ</span>
+
+<span class="n">env</span> <span class="o">=</span> <span class="n">environ</span><span class="p">.</span><span class="n">Env</span><span class="p">()</span>
+<span class="n">environ</span><span class="p">.</span><span class="n">Env</span><span class="p">.</span><span class="n">read_env</span><span class="p">()</span>
+
+<span class="c1"># Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+</span>
+<span class="c1"># SECURITY WARNING: keep the secret key used in production secret!
+</span><span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">env</span><span class="p">(</span><span class="s">'SECRET_KEY'</span><span class="p">)</span>
+
+<span class="c1"># SECURITY WARNING: don't run with debug turned on in production!
+</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="n">env</span><span class="p">(</span><span class="s">'DJANGO_DEBUG'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="nb">list</span><span class="p">(</span><span class="s">'ALLOWED_HOSTS'</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[]))</span>
+
+<span class="p">...</span>
+
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'default'</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">'ENGINE'</span><span class="p">:</span> <span class="s">'django.db.backends.postgresql'</span><span class="p">,</span>
+        <span class="s">'NAME'</span><span class="p">:</span> <span class="n">env</span><span class="p">(</span><span class="s">'DATABASE_NAME'</span><span class="p">),</span>
+        <span class="s">'USER'</span><span class="p">:</span> <span class="n">env</span><span class="p">(</span><span class="s">'DATABASE_USER'</span><span class="p">),</span>
+        <span class="s">'HOST'</span><span class="p">:</span> <span class="n">env</span><span class="p">(</span><span class="s">'DATABASE_HOST'</span><span class="p">),</span>
+        <span class="s">'PASSWORD'</span><span class="p">:</span> <span class="n">env</span><span class="p">(</span><span class="s">'DATABASE_PASS'</span><span class="p">),</span>
+        <span class="s">'PORT'</span><span class="p">:</span> <span class="n">env</span><span class="p">(</span><span class="s">'DATABASE_PORT'</span><span class="p">),</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>Masih di file settings.py, tambahkan corsheaders di dalam MIDDLERWARE, kemudian tambahkan juga app blog, corsheaders, rest_framework dan django_summernote ke dalam INSTALLED_APPS. dan setting template direktori dengan menambahkan folder build yang dihasilkan dari reactjs.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># settings.py
+</span><span class="p">....</span>
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">'django.contrib.admin'</span><span class="p">,</span>
+    <span class="s">'django.contrib.auth'</span><span class="p">,</span>
+    <span class="s">'django.contrib.contenttypes'</span><span class="p">,</span>
+    <span class="s">'django.contrib.sessions'</span><span class="p">,</span>
+    <span class="s">'django.contrib.messages'</span><span class="p">,</span>
+    <span class="s">'django.contrib.staticfiles'</span><span class="p">,</span>
+    <span class="s">'corsheaders'</span><span class="p">,</span>
+    <span class="s">'rest_framework'</span><span class="p">,</span>
+    <span class="s">'django_summernote'</span><span class="p">,</span>
+    <span class="s">'blog'</span><span class="p">,</span>
+   
+
+<span class="p">]</span>
+
+<span class="n">MIDDLEWARE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">'corsheaders.middleware.CorsMiddleware'</span><span class="p">,</span>
+    <span class="s">'django.middleware.security.SecurityMiddleware'</span><span class="p">,</span>
+    <span class="s">'django.contrib.sessions.middleware.SessionMiddleware'</span><span class="p">,</span>
+    <span class="s">'django.middleware.common.CommonMiddleware'</span><span class="p">,</span>
+    <span class="s">'django.middleware.csrf.CsrfViewMiddleware'</span><span class="p">,</span>
+    <span class="s">'django.contrib.auth.middleware.AuthenticationMiddleware'</span><span class="p">,</span>
+    <span class="s">'django.contrib.messages.middleware.MessageMiddleware'</span><span class="p">,</span>
+    <span class="s">'django.middleware.clickjacking.XFrameOptionsMiddleware'</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s">'BACKEND'</span><span class="p">:</span> <span class="s">'django.template.backends.django.DjangoTemplates'</span><span class="p">,</span>
+        <span class="s">'DIRS'</span><span class="p">:</span> <span class="p">[</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">),</span> <span class="s">'build'</span><span class="p">],</span>
+        <span class="s">'APP_DIRS'</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="s">'OPTIONS'</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">'context_processors'</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s">'django.template.context_processors.debug'</span><span class="p">,</span>
+                <span class="s">'django.template.context_processors.request'</span><span class="p">,</span>
+                <span class="s">'django.contrib.auth.context_processors.auth'</span><span class="p">,</span>
+                <span class="s">'django.contrib.messages.context_processors.messages'</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+</code></pre></div></div>
+
+<p>Tambahkan setting static dan media direktori untuk folder media upload di settings.py</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># settings.py
+</span><span class="p">...</span>
+<span class="c1"># Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+</span>
+<span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s">'/static/'</span>
+<span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s">'build/static'</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">STATIC_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s">'static'</span><span class="p">)</span>
+
+<span class="n">MEDIA_URL</span> <span class="o">=</span> <span class="s">'/media/'</span>
+<span class="n">MEDIA_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s">'media'</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Supaya Web blog ini dapat mengirim email ke admin ketika ada pengguna yang mengirim form contact, tambahkan EmailBackend pada settings.py.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># settings.py
+</span>
+<span class="p">....</span>
+<span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s">'django.core.mail.backends.smtp.EmailBackend'</span>
+<span class="n">EMAIL_HOST</span> <span class="o">=</span> <span class="n">env</span><span class="p">(</span><span class="s">'E_HOST'</span><span class="p">)</span>
+<span class="n">EMAIL_PORT</span> <span class="o">=</span> <span class="n">env</span><span class="p">(</span><span class="s">'E_PORT'</span><span class="p">)</span>
+<span class="n">EMAIL_HOST_USER</span> <span class="o">=</span> <span class="n">env</span><span class="p">(</span><span class="s">'E_HOSTUSER'</span><span class="p">)</span>
+<span class="n">EMAIL_HOST_PASSWORD</span> <span class="o">=</span> <span class="n">env</span><span class="p">(</span><span class="s">'E_HOSTPASSWORD'</span><span class="p">)</span>
+<span class="n">EMAIL_USE_TLS</span><span class="o">=</span> <span class="n">env</span><span class="p">(</span><span class="s">'E_USETLS'</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Dan tambahkan parameter untuk EMAIL_BACKEND di file .env</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># .env
+</span>
+<span class="p">...</span>
+<span class="n">E_HOST</span><span class="o">=</span><span class="n">smtp</span><span class="p">.</span><span class="n">gmail</span><span class="p">.</span><span class="n">com</span>
+<span class="n">E_PORT</span><span class="o">=</span><span class="mi">587</span>
+<span class="n">E_HOSTUSER</span><span class="o">=</span><span class="n">adminmail</span><span class="o">@</span><span class="n">gmail</span><span class="p">.</span><span class="n">com</span>
+<span class="n">E_HOSTPASSWORD</span><span class="o">=</span><span class="n">adminmailapp_password</span>
+<span class="n">E_USETLS</span><span class="o">=</span><span class="bp">True</span>
+
+</code></pre></div></div>
+
+<p>Kemudian tambahkan setting untuk REST_FRAMEWORK. pertama tambahkan urlpattern di urls.py.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># urls.py
+</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'api-auth/'</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">'rest_framework.urls'</span><span class="p">)),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'admin/'</span><span class="p">,</span> <span class="n">admin</span><span class="p">.</span><span class="n">site</span><span class="p">.</span><span class="n">urls</span><span class="p">),</span>
+<span class="p">]</span>
+
+</code></pre></div></div>
+
+<p>dan tambahkan DEFAULT_PERMISSION_CLASSES untuk REST_FRAMEWORK di settings.py</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># settings.py
+</span><span class="p">....</span>
+
+<span class="n">REST_FRAMEWORK</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'DEFAULT_PERMISSION_CLASSES'</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s">'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>Kita telah menambahkan corsheaders di INSTALLED_APPS, dan di middleware classes. Untuk mengaktifkan CORS (Cross-Origin_resouce-sharing) perlu di tambahkan konfigurasi di settings.py. CORS ini berfungsi supaya django dapat berinteraksi dengan <strong><em>resource</em></strong> lain di domain yang berbeda. untuk mengetahui lebih detail mengenai CORS dapat di baca disini <a href="https://www.stackhawk.com/blog/django-cors-guide/">Django CORS GUIDE</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># settings.py
+</span>
+<span class="p">....</span>
+
+<span class="n">CORS_ORIGIN_ALLOW_ALL</span> <span class="o">=</span> <span class="bp">True</span>
+
+</code></pre></div></div>
+
+<p>Kita tambahkan theme option untuk <a href="https://github.com/summernote/django-summernote">django-summernote</a>, modul django-summernote membuat kita dapat menyematkan editor WYSIWYG Summernote ke dalam django.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># settings.py
+</span>
+<span class="p">....</span>
+<span class="n">SUMMERNOTE_THEME</span> <span class="o">=</span> <span class="s">'bs4'</span>
+</code></pre></div></div>
+
+<p>Setelah menambahkan django-summernote di settings.py kemudian tambahkan django_summernote dan settings MEDIA_URL di urls.py</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># urls.py
+</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">....</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'summernote/'</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">'django_summernote.urls'</span><span class="p">)),</span>
+<span class="p">]</span> <span class="o">+</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">MEDIA_URL</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">settings</span><span class="p">.</span><span class="n">MEDIA_ROOT</span><span class="p">)</span>
+
+<span class="n">urlpatterns</span> <span class="o">+=</span> <span class="p">[</span><span class="n">re_path</span><span class="p">(</span><span class="sa">r</span><span class="s">'^.*'</span><span class="p">,</span> <span class="n">TemplateView</span><span class="p">.</span><span class="n">as_view</span><span class="p">(</span><span class="n">template_name</span><span class="o">=</span><span class="s">'index.html'</span><span class="p">))]</span>
+
+</code></pre></div></div>
+
+<p>Terakhir di urls.py kita tambahkan path untuk API blog app yang akan kita buat.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># urls.py
+</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">....</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'api/blog/'</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">'blog.urls'</span><span class="p">)),</span>
+<span class="p">]</span>
+
+</code></pre></div></div>
+<p>Ok konfigurasi settings.py dan urls.py untuk project sudah selesai selanjutnya kita ke detail blog app. Langkah pertama kita buat modelnya, 
+class model yang kita buat yaitu :</p>
+<ol>
+  <li>class Contact untuk menyimpan data contact form.</li>
+  <li>class Testimonial untuk menyimpan data testimonial.</li>
+  <li>class Profile untuk menyimpan data personal profile.</li>
+  <li>class Job untuk menyimpan data project yang pernah di kerjakan.</li>
+  <li>class Portofolio_cat untuk menyimpan data kategori portfolio.</li>
+  <li>class Portofolio untuk menyimpan data portfolio.</li>
+  <li>class Categories untuk menyimpan data kategori blog (Menu Blog)</li>
+  <li>class BlogPost untuk menyimpan data post artikel</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># models.py
+</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">django.db.models.fields</span> <span class="kn">import</span> <span class="n">CharField</span><span class="p">,</span> <span class="n">TextField</span>
+<span class="kn">from</span> <span class="nn">django.db.models.query</span> <span class="kn">import</span> <span class="n">QuerySet</span>
+<span class="kn">from</span> <span class="nn">django.template.defaultfilters</span> <span class="kn">import</span> <span class="n">default</span><span class="p">,</span> <span class="n">slugify</span>
+<span class="kn">from</span> <span class="nn">rest_framework.fields</span> <span class="kn">import</span> <span class="n">ImageField</span>
+
+
+<span class="k">class</span> <span class="nc">Contact</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">contact_date</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="p">.</span><span class="n">now</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">email</span>
+
+<span class="k">class</span> <span class="nc">Testimonial</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">testimonial_name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">testimonial_title</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">70</span><span class="p">)</span>
+    <span class="n">testimonial_img</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ImageField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s">'photos/%Y/%m/%d'</span><span class="p">)</span>
+    <span class="n">testimonial_icon</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ImageField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s">'photos/%Y/%m/%d'</span><span class="p">)</span>
+    <span class="n">testimonial_desc</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">testimonial_featured</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s">"Testimonial"</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">testimonial_name</span>
+
+<span class="k">class</span> <span class="nc">Profile</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">work_title</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">70</span><span class="p">)</span>
+    <span class="n">work_desc</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+     
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s">"Profile"</span>
+
+    <span class="k">def</span> <span class="nf">arr_worktitle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">work_title</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">work_title</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">","</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">name</span>
+
+<span class="k">class</span> <span class="nc">Job</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">job_name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">job_icon</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ImageField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s">'photos/%Y/%m/%d'</span><span class="p">)</span>
+    <span class="n">job_desc</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">jobs_thumbnail</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ImageField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s">'photos/%Y/%m/%d'</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s">"Job"</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">job_name</span>
+
+<span class="k">class</span> <span class="nc">Portofolio_cat</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">port_cat_name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s">"Portofolio Category"</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="s">"Portofolio Category"</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s">'id'</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">port_cat_name</span>
+    
+<span class="k">class</span> <span class="nc">Portofolio</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">porto_cat_id</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Portofolio_cat</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">'portfolios'</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="p">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">porto_title</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">porto_date</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="p">.</span><span class="n">now</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">porto_thumbnail</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ImageField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s">'photos/%Y/%m/%d'</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s">"Portofolio"</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">porto_title</span>
+
+<span class="k">class</span> <span class="nc">Categories</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">cat_title</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s">"Categories"</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">cat_title</span>
+
+<span class="k">class</span> <span class="nc">BlogPost</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">cat_title_id</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Categories</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">'posts'</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="p">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">slug</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">SlugField</span><span class="p">()</span>
+    <span class="n">thumbnail</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ImageField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s">'photos/%Y/%m/%d/'</span><span class="p">)</span>
+    <span class="n">excerpt</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+    <span class="n">month</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">day</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">featured</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">date_created</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="p">.</span><span class="n">now</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">original_slug</span> <span class="o">=</span> <span class="n">slugify</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">querySet</span> <span class="o">=</span> <span class="n">BlogPost</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nb">all</span><span class="p">().</span><span class="nb">filter</span><span class="p">(</span><span class="n">slug__iexact</span><span class="o">=</span><span class="n">original_slug</span><span class="p">).</span><span class="n">count</span><span class="p">()</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">slug</span> <span class="o">=</span> <span class="n">original_slug</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">querySet</span><span class="p">):</span>
+            <span class="n">slug</span> <span class="o">=</span> <span class="n">original_slug</span> <span class="o">+</span> <span class="s">'-'</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">querySet</span> <span class="o">=</span> <span class="n">BlogPost</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nb">all</span><span class="p">().</span><span class="nb">filter</span><span class="p">(</span><span class="n">slug__iexact</span><span class="o">=</span><span class="n">slug</span><span class="p">).</span><span class="n">count</span><span class="p">()</span>
+
+            <span class="c1"># first-blog-post-slug
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">slug</span> <span class="o">=</span> <span class="n">slug</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">featured</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">BlogPost</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">featured</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span> <span class="o">!=</span> <span class="n">temp</span><span class="p">:</span>
+                    <span class="n">temp</span><span class="p">.</span><span class="n">featured</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">temp</span><span class="p">.</span><span class="n">save</span><span class="p">()</span>
+                
+            <span class="k">except</span> <span class="n">BlogPost</span><span class="p">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="k">pass</span>
+        
+        <span class="nb">super</span><span class="p">(</span><span class="n">BlogPost</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+ 
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">title</span>
+</code></pre></div></div>
+<p>Setelah model dibuat, selanjutnya kita lakukan migrate.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="o">/</span><span class="n">blog_personal</span><span class="err">$</span> <span class="n">python</span> <span class="n">manage</span><span class="p">.</span><span class="n">py</span> <span class="n">makemigration</span> <span class="n">blog</span>
+<span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="o">/</span><span class="n">blog_personal</span><span class="err">$</span> <span class="n">python</span> <span class="n">manage</span><span class="p">.</span><span class="n">py</span> <span class="n">migrate</span>
+
+</code></pre></div></div>
+
+<p>Selanjutnya kita buat superuser untuk pengguna yang akan menggunakan admin site.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="o">/</span><span class="n">blog_personal</span><span class="err">$</span> <span class="n">python</span> <span class="n">manage</span><span class="p">.</span><span class="n">py</span> <span class="n">createsuperuser</span>
+
+<span class="n">Username</span><span class="p">:</span> <span class="n">admin</span>
+<span class="n">email</span> <span class="n">address</span> <span class="p">:</span> <span class="n">admin</span><span class="o">@</span><span class="n">example</span><span class="p">.</span><span class="n">com</span>
+
+<span class="n">Password</span><span class="p">:</span> <span class="o">**********</span>
+<span class="n">Password</span> <span class="p">(</span><span class="n">again</span><span class="p">):</span> <span class="o">*********</span>
+<span class="n">Superuser</span> <span class="n">created</span> <span class="n">successfully</span><span class="p">.</span>
+</code></pre></div></div>
+
+<p>Karena kita menggunakan Django REST Framework dan ReactJS sebagai front-end, kita perlu membuat Serializer untuk mengubah object menjadi tipe data yang dapat di mengerti javascripts dan front-end frameworks</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># serializers.py
+</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">fields</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">BlogPost</span><span class="p">,</span> <span class="n">Categories</span><span class="p">,</span> <span class="n">Contact</span><span class="p">,</span> <span class="n">Portofolio</span><span class="p">,</span> <span class="n">Portofolio_cat</span><span class="p">,</span> <span class="n">Profile</span><span class="p">,</span> <span class="n">Job</span><span class="p">,</span> <span class="n">Testimonial</span>
+<span class="kn">from</span> <span class="nn">rest_framework</span> <span class="kn">import</span> <span class="n">serializers</span>
+
+
+<span class="c1"># Serializers define the API representation.
+</span><span class="k">class</span> <span class="nc">BlogPostSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="n">cat_title</span> <span class="o">=</span> <span class="n">serializers</span><span class="p">.</span><span class="n">ReadOnlyField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s">'cat_title_id.cat_title'</span><span class="p">)</span>
+    
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">BlogPost</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">'id'</span><span class="p">,</span> <span class="s">'title'</span><span class="p">,</span> <span class="s">'slug'</span><span class="p">,</span> <span class="s">'thumbnail'</span><span class="p">,</span> <span class="s">'excerpt'</span><span class="p">,</span> <span class="s">'month'</span><span class="p">,</span> <span class="s">'day'</span><span class="p">,</span> <span class="s">'content'</span><span class="p">,</span> <span class="s">'featured'</span><span class="p">,</span> <span class="s">'date_created'</span><span class="p">,</span> <span class="s">'cat_title_id'</span><span class="p">,</span> <span class="s">'cat_title'</span><span class="p">)</span>
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'slug'</span>
+
+    <span class="k">def</span> <span class="nf">get_image_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"request"</span><span class="p">)</span>
+        <span class="n">thumbnail_url</span> <span class="o">=</span> <span class="n">obj</span><span class="p">.</span><span class="n">thumbnail</span><span class="p">.</span><span class="n">url</span>
+        <span class="k">return</span> <span class="n">request</span><span class="p">.</span><span class="n">build_absolute_uri</span><span class="p">(</span><span class="n">thumbnail_url</span><span class="p">)</span>
+    
+
+<span class="k">class</span> <span class="nc">CategoriesSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Categories</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">'id'</span><span class="p">,</span> <span class="s">'cat_title'</span><span class="p">,</span> <span class="s">'url'</span><span class="p">)</span>
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'id'</span>
+    
+<span class="k">class</span> <span class="nc">ProfileSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Profile</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">'name'</span><span class="p">,</span> <span class="s">'work_desc'</span><span class="p">,</span> <span class="s">'work_title'</span><span class="p">,</span> <span class="s">'arr_worktitle'</span><span class="p">)</span>
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'name'</span>
+
+    <span class="k">def</span> <span class="nf">get_arr_worktitle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Profile</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ProfileSerializer</span><span class="p">(</span><span class="n">Profile</span><span class="p">.</span><span class="n">arr_worktitle</span><span class="p">()).</span><span class="n">data</span>
+
+        
+<span class="k">class</span> <span class="nc">JobsSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Job</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">'id'</span><span class="p">,</span> <span class="s">'job_name'</span><span class="p">,</span> <span class="s">'job_desc'</span><span class="p">,</span> <span class="s">'job_icon'</span><span class="p">,</span> <span class="s">'jobs_thumbnail'</span><span class="p">)</span>
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'job_name'</span> 
+
+<span class="k">class</span> <span class="nc">PortofolioSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="n">port_cate</span> <span class="o">=</span> <span class="n">serializers</span><span class="p">.</span><span class="n">ReadOnlyField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s">'porto_cat_id.port_cat_name'</span><span class="p">)</span>
+
+    
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Portofolio</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">'id'</span><span class="p">,</span> <span class="s">'porto_title'</span><span class="p">,</span> <span class="s">'porto_thumbnail'</span><span class="p">,</span> <span class="s">'port_cate'</span><span class="p">)</span>
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'porto_title'</span>
+
+<span class="k">class</span> <span class="nc">PortofolioCatSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Portofolio_cat</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">'id'</span><span class="p">,</span> <span class="s">'port_cat_name'</span><span class="p">)</span>
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'port_cat_name'</span>
+
+<span class="k">class</span> <span class="nc">TestimonialSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Testimonial</span>
+        <span class="n">fields</span> <span class="o">=</span>  <span class="p">(</span><span class="s">'id'</span><span class="p">,</span> <span class="s">'testimonial_name'</span><span class="p">,</span> <span class="s">'testimonial_title'</span><span class="p">,</span> <span class="s">'testimonial_img'</span><span class="p">,</span> <span class="s">'testimonial_icon'</span><span class="p">,</span> <span class="s">'testimonial_desc'</span><span class="p">)</span>
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'testimonial_name'</span>
+
+<span class="k">class</span> <span class="nc">ConctactSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Contact</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s">'__all__'</span>
+
+</code></pre></div></div>
+<p>Setelah serializers dibuat, selanjutnya kita buat views.py</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># views.py
+</span>
+<span class="kn">from</span> <span class="nn">django.db.models.query</span> <span class="kn">import</span> <span class="n">QuerySet</span>
+<span class="kn">from</span> <span class="nn">rest_framework.response</span> <span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span> <span class="nn">rest_framework</span> <span class="kn">import</span> <span class="n">generics</span><span class="p">,</span> <span class="n">permissions</span><span class="p">,</span> <span class="n">serializers</span>
+<span class="kn">from</span> <span class="nn">rest_framework.views</span> <span class="kn">import</span> <span class="n">APIView</span>
+<span class="kn">from</span> <span class="nn">django.core.mail</span> <span class="kn">import</span> <span class="n">send_mail</span>
+<span class="kn">from</span> <span class="nn">django.views.decorators.cache</span> <span class="kn">import</span> <span class="n">never_cache</span>
+
+
+<span class="kn">from</span> <span class="nn">blog.models</span> <span class="kn">import</span> <span class="n">BlogPost</span><span class="p">,</span> <span class="n">Categories</span><span class="p">,</span> <span class="n">Portofolio</span><span class="p">,</span> <span class="n">Profile</span><span class="p">,</span> <span class="n">Job</span><span class="p">,</span> <span class="n">Portofolio_cat</span><span class="p">,</span> <span class="n">Testimonial</span><span class="p">,</span> <span class="n">Contact</span>
+<span class="kn">from</span> <span class="nn">blog.serializers</span> <span class="kn">import</span> <span class="n">BlogPostSerializer</span><span class="p">,</span> <span class="n">JobsSerializer</span><span class="p">,</span> <span class="n">PortofolioSerializer</span><span class="p">,</span> <span class="n">TestimonialSerializer</span>
+<span class="kn">from</span> <span class="nn">blog.serializers</span> <span class="kn">import</span> <span class="n">CategoriesSerializer</span>
+<span class="kn">from</span> <span class="nn">blog.serializers</span> <span class="kn">import</span> <span class="n">ProfileSerializer</span>
+<span class="kn">from</span> <span class="nn">blog.serializers</span> <span class="kn">import</span> <span class="n">PortofolioCatSerializer</span>
+
+<span class="kn">from</span> <span class="nn">danynotes.settings</span> <span class="kn">import</span> <span class="n">EMAIL_HOST_USER</span>
+ 
+
+<span class="k">class</span> <span class="nc">BlogPostListView</span><span class="p">(</span><span class="n">generics</span><span class="p">.</span><span class="n">ListAPIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">BlogPost</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'-date_created'</span><span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">BlogPostSerializer</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'slug'</span>
+    
+<span class="k">class</span> <span class="nc">BlogPostDetailView</span><span class="p">(</span><span class="n">generics</span><span class="p">.</span><span class="n">RetrieveAPIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">BlogPost</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'-date_created'</span><span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">BlogPostSerializer</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'slug'</span>
+
+
+<span class="k">class</span> <span class="nc">BlogPostFeaturedView</span><span class="p">(</span><span class="n">generics</span><span class="p">.</span><span class="n">ListAPIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">BlogPost</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nb">all</span><span class="p">().</span><span class="nb">filter</span><span class="p">(</span><span class="n">featured</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">BlogPostSerializer</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'slug'</span>
+
+
+<span class="k">class</span> <span class="nc">BlogPostCategoryView</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">BlogPostSerializer</span>
+    
+
+
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">request</span><span class="p">.</span><span class="n">data</span>
+        <span class="n">cat_title_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'cat_title_id'</span><span class="p">]</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">BlogPost</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'-date_created'</span><span class="p">).</span><span class="nb">filter</span><span class="p">(</span><span class="n">cat_title_id</span><span class="o">=</span><span class="n">cat_title_id</span><span class="p">)</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">BlogPostSerializer</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s">"request"</span><span class="p">:</span> <span class="n">request</span><span class="p">},</span> <span class="n">many</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="p">.</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">CategoriesView</span><span class="p">(</span><span class="n">generics</span><span class="p">.</span><span class="n">ListAPIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Categories</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'id'</span><span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">CategoriesSerializer</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'cat_title'</span>
+
+
+<span class="k">class</span> <span class="nc">ProfileView</span><span class="p">(</span><span class="n">generics</span><span class="p">.</span><span class="n">ListAPIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Profile</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'name'</span><span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">ProfileSerializer</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'name'</span>
+
+
+<span class="k">class</span> <span class="nc">JobsView</span><span class="p">(</span><span class="n">generics</span><span class="p">.</span><span class="n">ListAPIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Job</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'job_name'</span><span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">JobsSerializer</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'job_name'</span>
+
+
+<span class="k">class</span> <span class="nc">PortoCategoryView</span><span class="p">(</span><span class="n">generics</span><span class="p">.</span><span class="n">ListAPIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Portofolio_cat</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'id'</span><span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">PortofolioCatSerializer</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'port_cat_name'</span>
+
+
+<span class="k">class</span> <span class="nc">PortoFolioView</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">PortofolioSerializer</span>
+    
+
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">request</span><span class="p">.</span><span class="n">data</span>
+        <span class="n">porto_cat_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'porto_cat_id'</span><span class="p">]</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Portofolio</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'-porto_date'</span><span class="p">).</span><span class="nb">filter</span><span class="p">(</span><span class="n">porto_cat_id</span><span class="o">=</span><span class="n">porto_cat_id</span><span class="p">)</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">PortofolioSerializer</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s">"request"</span><span class="p">:</span> <span class="n">request</span><span class="p">},</span> <span class="n">many</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="p">.</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">TestimonyView</span><span class="p">(</span><span class="n">generics</span><span class="p">.</span><span class="n">ListAPIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Testimonial</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">'id'</span><span class="p">)</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">TestimonialSerializer</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s">'testimonial_name'</span>
+
+<span class="k">class</span> <span class="nc">ContactView</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+    <span class="n">permissions_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="p">.</span><span class="n">AllowAny</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">request</span><span class="p">.</span><span class="n">data</span>
+        <span class="n">subject</span> <span class="o">=</span> <span class="s">'danynotes - '</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'message'</span><span class="p">]</span>
+        <span class="n">from_email</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'email'</span><span class="p">]</span>
+
+            
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">send_mail</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">from_email</span><span class="p">,</span> <span class="p">[</span><span class="n">EMAIL_HOST_USER</span><span class="p">],</span> <span class="n">fail_silently</span><span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+
+            <span class="n">contact</span> <span class="o">=</span> <span class="n">Contact</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="n">from_email</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+            <span class="n">contact</span><span class="p">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s">'success'</span><span class="p">:</span> <span class="s">'Message sent successfully'</span><span class="p">})</span>
+        
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s">'error'</span><span class="p">:</span> <span class="s">'Message failed to send'</span><span class="p">})</span>
+
+
+</code></pre></div></div>
+
+<p>Terakhir kita buat url untuk akses view tersebut.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># urls.py
+</span>
+<span class="kn">from</span> <span class="nn">django.urls</span> <span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">rest_framework.serializers</span> <span class="kn">import</span> <span class="n">as_serializer_error</span>
+
+<span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">BlogPostListView</span><span class="p">,</span> <span class="n">BlogPostDetailView</span><span class="p">,</span> <span class="n">BlogPostFeaturedView</span><span class="p">,</span> <span class="n">BlogPostCategoryView</span><span class="p">,</span> <span class="n">JobsView</span><span class="p">,</span> <span class="n">PortoFolioView</span>
+<span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">CategoriesView</span><span class="p">,</span> <span class="n">ProfileView</span><span class="p">,</span> <span class="n">TestimonyView</span>
+<span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">PortoCategoryView</span>
+<span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">ContactView</span>
+
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="n">BlogPostListView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'featured'</span><span class="p">,</span> <span class="n">BlogPostFeaturedView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'category'</span><span class="p">,</span> <span class="n">BlogPostCategoryView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'&lt;slug&gt;'</span><span class="p">,</span> <span class="n">BlogPostDetailView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'list_category/'</span><span class="p">,</span> <span class="n">CategoriesView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'profile/'</span><span class="p">,</span> <span class="n">ProfileView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'jobs/'</span><span class="p">,</span> <span class="n">JobsView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'portofolio_category/'</span><span class="p">,</span> <span class="n">PortoCategoryView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'portofolios/'</span><span class="p">,</span> <span class="n">PortoFolioView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'testimonial/'</span><span class="p">,</span> <span class="n">TestimonyView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s">'contact/'</span><span class="p">,</span> <span class="n">ContactView</span><span class="p">.</span><span class="n">as_view</span><span class="p">()),</span>
+<span class="p">]</span>
+
+</code></pre></div></div>
+
+<p>Setelah urls.py selesai dibuat, selanjutnya coba akses URL API menggunakan Postman, sebelumnya jangan lupa untuk menjalankan server.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">envblog</span><span class="p">)</span> <span class="n">dany</span><span class="o">@</span><span class="n">hp</span><span class="p">:</span><span class="o">~/</span><span class="n">blog_project</span><span class="o">/</span><span class="n">backend</span><span class="o">/</span><span class="n">blog_personal</span><span class="err">$</span><span class="n">python</span> <span class="n">manage</span><span class="p">.</span><span class="n">py</span> <span class="n">runserver</span>
+
+
+<span class="n">Watching</span> <span class="k">for</span> <span class="nb">file</span> <span class="n">changes</span> <span class="k">with</span> <span class="n">StatReloader</span>
+<span class="n">Performing</span> <span class="n">system</span> <span class="n">checks</span><span class="p">...</span>
+
+<span class="n">System</span> <span class="n">check</span> <span class="n">identified</span> <span class="n">no</span> <span class="n">issues</span> <span class="p">(</span><span class="mi">0</span> <span class="n">silenced</span><span class="p">).</span>
+<span class="n">March</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">2022</span> <span class="o">-</span> <span class="mi">04</span><span class="p">:</span><span class="mi">38</span><span class="p">:</span><span class="mi">26</span>
+<span class="n">Django</span> <span class="n">version</span> <span class="mf">3.2</span><span class="p">.</span><span class="mi">5</span><span class="p">,</span> <span class="n">using</span> <span class="n">settings</span> <span class="s">'blog_personal.settings'</span>
+<span class="n">Starting</span> <span class="n">development</span> <span class="n">server</span> <span class="n">at</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="p">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">8000</span><span class="o">/</span>
+<span class="n">Quit</span> <span class="n">the</span> <span class="n">server</span> <span class="k">with</span> <span class="n">CONTROL</span><span class="o">-</span><span class="n">C</span><span class="p">.</span>
+
+</code></pre></div></div>
+
+<p><img src="../assets/media/postman_personalblog.png" alt="Postman_personalblog" /></p>
+
+<p>Selesai pembuatan backend dan Django Restframework, selanjutnya buat <a href="/web%20development/2022/03/04/membuat-blog-menggunakan-django-dan-reactjs(Lanjutan)">tampilan frontend dengan ReactJS</a>.</p>
+
+<p>Source code lengkap dapat lihat di <a href="https://github.com/noufath/reactjs_with_django_portfolio_and_blog_web">repository ini</a>.</p>
