@@ -690,7 +690,7 @@ Quit the server with CONTROL-C.
 
 ```
 
-![Postman_personalblog](../assets/media/postman_personalblog.png)
+![postman_personalblog](https://user-images.githubusercontent.com/7325133/158960153-a3f6a299-84dd-426e-85d0-39c9573b00f1.png)
 
 Selesai pembuatan backend dan Django Restframework, selanjutnya buat [tampilan frontend dengan ReactJS](/web%20development/2022/03/04/membuat-blog-menggunakan-django-dan-reactjs(Lanjutan)).
 
