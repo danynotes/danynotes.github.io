@@ -120,6 +120,18 @@ def run():
 
 ```
 
+Ketika aplikasi dijalankan, di dalam root folder aplikasi akan terbentuk file app.log yang berisi log dari aplikasi berjalan. Contoh isi app.log sebagai berikut :
+
+```log
+[INFO:2022-04-15 22:10:03,579] connect - Connecting to the PostgreSQL database ...
+[INFO:2022-04-15 22:10:03,586] connect - Database Connected
+[INFO:2022-04-15 22:10:03,590] pg_cursor - pg_cursor created
+[INFO:2022-04-15 22:10:03,593] run - Start collecting data from server
+[INFO:2022-04-15 22:10:05,289] SaveToDatabase - Finished Collecting Main data
+[INFO:2022-04-15 22:10:06,433] run - Finished collecting data from server
+
+```
+
 Kesimpulan :
 
 Dengan module root logger ini memudahkan dalam mengintegrasikan pengaturan logging yang akan digunakan didalam proyek aplikasi yang dibuat.
